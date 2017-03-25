@@ -1,68 +1,73 @@
 package ahmet.example.com.trimtramandroidapp;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by Ahmet on 25-Mar-17.
  */
 public class User {
-    private String userId;
-    private String userName;
+    private String id;
+    private String name;
     private String privateKey;
 
+    public User() {}
+
     /**
-     * @param userName
+     * @param name
      * Constructor
      */
-    public User(String userName) {
-        this.userName = userName;
+    public User(String name) {
+        this.name = name;
     }
 
     /**
-     * @param userId
-     * @param userName
+     * @param id
+     * @param name
      * @param privateKey
      * Constructor
      */
-    public User(String userId, String userName, String privateKey) {
-        this.userId = userId;
-        this.userName = userName;
+    public User(String id, String name, String privateKey) {
+        this.id = id;
+        this.name = name;
         this.privateKey = privateKey;
     }
 
     /**
      * @return String
-     * This method return user id
+     * This method return id
      */
-    public String getUserId() {
-        return userId;
+    public String getId() {
+        return id;
     }
 
     /**
-     * @param userId
-     * This method set user id
+     * @param id
+     * This method set id
      */
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    /**
-     * @return String
-     * This method return user
-     */
-    public String getUserName() {
-        return userName;
-    }
-
-    /**
-     * @param userName
-     * This method set user id
-     */
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
      * @return String
-     * This method return user private key
+     * This method return name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name
+     * This method set name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return String
+     * This method return private key
      */
     public String getPrivateKey() {
         return privateKey;
@@ -70,9 +75,30 @@ public class User {
 
     /**
      * @param privateKey
-     * This method set user private key
+     * This method set private key
      */
     public void setPrivateKey(String privateKey) {
         this.privateKey = privateKey;
+    }
+
+    public void createFromJSONString(String jsonData) throws JSONException {
+        // convert user string data to json object
+        JSONObject userJSON = new JSONObject(jsonData);
+
+        // set id of user object
+        this.setId(userJSON.getString("_id"));
+        // set name of user object
+        this.setName(userJSON.getString("username"));
+        // set privateKey of user object
+        this.setPrivateKey(userJSON.getString("private_key"));
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", privateKey='" + privateKey + '\'' +
+                '}';
     }
 }

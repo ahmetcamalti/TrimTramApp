@@ -78,7 +78,7 @@ public class SignInActivity extends AppCompatActivity {
     }
 
     /**
-     * Represents an asynchronous add book task for new book
+     * Represents an asynchronous sign in request
      */
     public class SignIn extends AsyncTask<Void, Void, Boolean> {
 
@@ -98,7 +98,7 @@ public class SignInActivity extends AppCompatActivity {
             try {
                 // Simulate network access.
                 String responseData = null;
-                String url = "http://trimtramapp.herokuapp.com/users/addUser/" + mUserName;
+                String url = "http://zabalunga.herokuapp.com/users/addUser/" + mUserName;
                 try {
                     Request request = new Request.Builder()
                             .url(url)
@@ -115,7 +115,7 @@ public class SignInActivity extends AppCompatActivity {
                 JSONObject json = new JSONObject(responseData);
 
                 // check your log for json response
-                Log.v("Login Server Response", json.toString());
+                Log.v("LoginServerResponse", json.toString());
 
                 // json success tag
                 success = json.getInt("success");
@@ -123,7 +123,7 @@ public class SignInActivity extends AppCompatActivity {
                 if (success == 1) {
                     JSONObject userData = json.getJSONObject("user");
 
-                    mUser.setUserId(userData.getString("_id"));
+                    mUser.setId(userData.getString("_id"));
                     mUser.setPrivateKey(userData.getString("private_key"));
                 }
                 serverMessage = json.getString("message");
@@ -151,8 +151,8 @@ public class SignInActivity extends AppCompatActivity {
 
                 // Writing data to SharedPreferences
                 SharedPreferences.Editor editor = settings.edit();
-                editor.putString("user_id", mUser.getUserId());
-                editor.putString("user_name", mUser.getUserName());
+                editor.putString("user_id", mUser.getId());
+                editor.putString("user_name", mUser.getName());
                 editor.putString("user_private_key", mUser.getPrivateKey());
                 editor.putBoolean("logged_in", true);
 
