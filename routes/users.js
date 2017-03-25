@@ -2,6 +2,7 @@ var express = require('express');
 var rand = require("random-key");
 var random_name = require('node-random-name');
 var router = express.Router();
+var helpers = require('../helpers');
 
 var User = require('../models/user');
 var Travel = require('../models/travel');
@@ -19,45 +20,40 @@ function generateNewUser(username, travels){
 router.get('/all', function(req, res, next) {
   // get all the users
   User.find({}, function(err, result) {
-    if (err) throw err;
+    if (err){
+      response = helpers.respond(0,err);
+    }else{
+      response = helpers.respond(1,"all users",result);
+    }
 
     // save the result into the response object.
-    res.json(result);
+    res.json(response);
   });
 });
 
 /* add new user */
 router.get('/addUser/:username', function(req, res, next) {
   // check is there a param?
+  var response;
   if (!req.params.username) {
-    response = {
-      success: 0,
-      message: "There isn't any user parameter!"
-    };
-
+    response = helpers.respond(0, "There isn't any user parameter!");
+    console.log(response);
     res.json(response);
+  }else{
+    // create a new user
+    var newUser = generateNewUser(req.params.username);
+
+    // save the user
+    newUser.save(function(err, user) {
+      if (err){
+        response = helpers.respond(0,err);
+        console.log(response);
+      }else{
+        response = helpers.respond(1,"User added to database with success!", user);
+      }
+      res.json(response);
+    });
   }
-
-  // create a new user
-  var newUser = generateNewUser(req.params.username);
-
-  // save the user
-  newUser.save(function(err, user) {
-    if (err) throw err;
-
-    // message for server
-    console.log('User created!');
-
-    // response for client
-    response = {
-      success: 1,
-      message: "User added to database with success!",
-      user: user
-    }
-
-    // response error
-    res.json(response);
-  });
 });
 
 /* remove all users */
@@ -66,29 +62,11 @@ router.get('/clear', function(req, res, next) {
   User.remove({}, function(err, result) {
     // remove all budgeds data
     if (err) {
-      var message = "There is an error on database";
-
-      // message for server
-      console.log(message);
-
-      // response message for client
-      response = {
-        success: 0,
-        message: message
-      };
+      response = helpers.respond(0,message);
+      console.log(response);
     } else {
-      var message = "All users removed succesfully!";
-
-      // message for server
-      console.log(message);
-
-      // response message for client
-      response = {
-        success: 1,
-        message: message
-      };
+      response = helpers.respond(1,"clear users success", []);
     }
-
     res.json(response);
   });
 });
@@ -101,13 +79,14 @@ router.get('/myTravels/:u_name/:p_key', function(req, res, next){
 
   User.findOne({username: username, private_key:private_key}).populate('travels').exec()
   .then(function(user){
-    res.json(user.travels);
+    response = helpers.respond(1, "get my travels", user.travels);
   })
   .then(undefined, function(err){
     //Handle error
-    console.log('error in myTravels/:u_name:/:p_key');
-    res.json('error in myTravels');
+    response = helpers.respond(0, 'error in myTravels/:u_name:/:p_key');
+    console.log(response);
   });
+  res.json(response);
 });
 
 // generates dummy users
@@ -116,30 +95,37 @@ router.get('/dummy', function(req, res, next){
   for (var i = 0; i < 10; i++){
     
     Travel.findRandom({},{},{limit:3},function(err, results){
-      if (err) throw err;
-      var uname = random_name();
-      var u = generateNewUser(uname, results);
-      u.save(function(err, user){
-        if (err) {
-          console.log('error in dummy user generation');
-        }
-        if (i == 9){
-          console.log("added 10 users");
-        }
-        for ( var j = 0; j < results.length; j++){
-          var r = results[j];
-          r.users.push(u._id);
-          r.going_cnt = r.going_cnt + 1;
-          r.save(function(err, re){
-            if (err) throw err;
-            console.log('user added to travel');
-          });
-        }
-      });
+      if (err) {
+        response = helpers.respond(0,'travel find random error');
+        console.log(response);
+      }else{
+        var uname = random_name();
+        var u = generateNewUser(uname, results);
+        u.save(function(err, user){
+          if (err) {
+            response = helpers.respond(0,'error in dummy user generation');
+            console.log(response);
+          }
+          if (i == 9){
+            console.log("added 10 users");
+            response = helpers.respond(1,"added 10 users", []);
+          }
+          for ( var j = 0; j < results.length; j++){
+            var r = results[j];
+            r.users.push(u._id);
+            r.going_cnt = r.going_cnt + 1;
+            r.save(function(err, re){
+              if (err){
+                response = helpers.respond(0,'travel find random error');
+              }
+            });
+          }
+        });
+      }
+
     });
   }
-
-  res.json('adding 10 users');
+  res.json(response);
 });
 
 module.exports = router;

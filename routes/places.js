@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Promise = require('bluebird');
-
+var helpers = require('../helpers');
 var Place = require('../models/place');
 
 // promisify the entire mongoose Model
@@ -11,10 +11,15 @@ Place = Promise.promisifyAll(Place)
 router.get('/all', function(req, res, next) {
   // get all the places
   Place.find({}, function(err, result) {
-    if (err) throw err;
+    if (err){
+    	response = helpers.respond(0, err);
+    	console.log(response);
+    }else{
+    	response = helpers.respond(1, "all places", result);
+    }
 
     // save the result into the response object.
-    res.json(result);
+    res.json(response);
   });
 });
 
@@ -42,15 +47,17 @@ router.get('/dummy', function(req, res, next){
 	});
 
 	loaded.then(function(){
-		res.json(places);
+		response = helpers.respond(1, "done", places);
 	})
 	.then(undefined, function(err){
     //Handle error
     if (err){
-    	console.log('error in dummy places');
-    	res.json('error in dummy');	
+    	response = helpers.respond(0, 'error in dummy places');
+    	console.log(response);	
     }
   });
+
+  res.json(response);
 
  	/*for (var i = 0; i < 10; i++){
  		var title = "place " + i;
@@ -64,30 +71,45 @@ router.get('/dummy', function(req, res, next){
 			}
 		});
  	}*/
-
-
  	//res.json('adding 10 places');
+
 });
 
 // delete all the places
 router.get('/clear', function(req, res, next){
 	Place.remove({},function(err, removed){
-  	if(err) throw err;
-  	res.json(removed);
+  	if(err){
+  		response = helpers.respond(0,err);
+  	}else{	
+  		response = helpers.respond(1,'clear places success',[]);
+  	}
+  	res.json(response);
   });
 });
 
 // get places by name (title)
 router.get('/byName/:title', function(req, res, next){
 	Place.find({title:req.params.title}, function(err, place){
-		res.json(place);
+		if (err){
+			response = helpers.respond(1,err);
+			console.log(response);
+		}else{
+			response = helpers.respond(1,"got the place",place);
+		}
+		res.json(response);
 	});
 });
 
 // get places by name (title)
 router.get('/searchByName/:title', function(req, res, next){
 	Place.find({title: {$regex:req.params.title, $options:"i"}}, function(err, places){
-		res.json(places);
+		if(err){
+			response = helpers.respond(1,err);
+		}else{
+			response = helpers.respond(1,"search by name succes",places);	
+		}
+
+		res.json(response);
 	});
 });
 

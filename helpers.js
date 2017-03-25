@@ -7,3 +7,11 @@ exports.getRandomInt = function(min, max) {
 }
 
 exports.dummy_event_names = ["sport", "game", "image", "football"];
+
+exports.respond = function(success, msg, data){
+	if (data){
+		return {success: success, message: msg, data: data};
+	}else{
+		return {success: success, message: msg};
+	}
+}
