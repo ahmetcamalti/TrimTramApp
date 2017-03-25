@@ -68,18 +68,44 @@ router.get('/addTravel/:travelData', function(req, res, next) {
   });
 });
 
-/* get travel by places */
-router.get('/getTravelByPlace/:place', function(req, res, next) {
+/* get travel by title */
+router.get('/getTravelByTitle/:title', function(req, res, next) {
   // create json objset from string
-  var thePlace = req.params.place;
-
+  var query = req.params.title;
+  
   // get all the travels filtering by places
-  Travel.find({place: thePlace}).exec()
+  Travel.find({title: {$regex:query, $options:"i"}}).exec()
   .then(function(travels){
     res.json(travels);
   })
   .then(undefined, function(err){
     //Handle error
+    console.log('err get travel from its name');
+  })
+});
+
+/* get travel by its place name */
+router.get('/getTravelByPlace/:title', function(req, res, next) {
+  // create json objset from string
+  var query = req.params.title;
+  
+  // get all the travels filtering by places
+  Travel.find({}).populate('place').exec()
+  .then(function(travels){
+    var result = [];
+
+    for (var i = 0; i < travels.length; i++){
+      var curr = travels[i].place.title;
+      if (curr.indexOf(query) !== -1){
+        result.push(travels[i]);
+      }
+    }
+
+    res.json(result);
+  })
+  .then(undefined, function(err){
+    //Handle error
+    console.log('err get travel from its name');
   })
 });
 

@@ -84,4 +84,11 @@ router.get('/byName/:title', function(req, res, next){
 	});
 });
 
+// get places by name (title)
+router.get('/searchByName/:title', function(req, res, next){
+	Place.find({title: {$regex:req.params.title, $options:"i"}}, function(err, places){
+		res.json(places);
+	});
+});
+
 module.exports = router;
