@@ -1,14 +1,12 @@
 var express = require('express');
-var rand = require("random-key");
 var router = express.Router();
 
-var User = require('../models/user');
-const crypto = require('crypto');
+var Travel = require('../models/travel');
 
-/* GET users listing. */
-router.get('/allUser', function(req, res, next) {
-  // get all the users
-  User.find({}, function(err, result) {
+/* GET travel listing. */
+router.get('/allTravel', function(req, res, next) {
+  // get all the travels
+  Travel.find({}, function(err, result) {
     if (err) throw err;
 
     // save the result into the response object.
@@ -16,48 +14,48 @@ router.get('/allUser', function(req, res, next) {
   });
 });
 
-/* add new user */
-router.get('/addUser/:username', function(req, res, next) {
+/* add new travel */
+router.get('/addTravel/:travelData', function(req, res, next) {
   // check is there a param?
-  if (!req.params.username) {
+  if (!req.params.travelData) {
     response = {
       success: 0,
-      message: "There isn't any user parameter!"
+      message: "There isn't any travel parameter!"
     };
 
+    // response error
     res.json(response);
   }
 
-  // create a new user
-  var newUser = User({
-    username: req.params.username,
-    private_key: rand.generate()
-  });
+  // create json objset from string
+  var theTravelData = JSON.parse(req.params.travelData);
 
-  // save the user
-  newUser.save(function(err, user) {
+  // create a new travel
+  var newTravel = Travel(theTravelData);
+
+  // save the travel
+  newTravel.save(function(err, theTravel) {
     if (err) throw err;
 
     // message for server
-    console.log('User created!');
+    console.log('New Travel created!');
 
     // response for client
     response = {
       success: 1,
-      message: "User added to database with success!",
-      user: user
+      message: "Travel added to database with success!",
+      travel: theTravel
     }
 
-    // response error
     res.json(response);
   });
 });
 
-/* remove all users */
-router.get('/removeAllUser', function(req, res, next) {
-  // get all the users
+/* remove all travels */
+router.get('/removeAllTravel', function(req, res, next) {
+
   User.remove({}, function(err, result) {
-    // remove all budgeds data
+    // remove all travels from database
     if (err) {
       var message = "There is an error on database";
 
@@ -70,7 +68,7 @@ router.get('/removeAllUser', function(req, res, next) {
         message: message
       };
     } else {
-      var message = "All users removed succesfully!";
+      var message = "All travels removed succesfully from database!";
 
       // message for server
       console.log(message);
