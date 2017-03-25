@@ -116,6 +116,7 @@ router.get('/clear', function(req, res, next) {
   });
 });
 
+// place and time filtering for travels
 router.get('/candidates/:specs', function(req, res, next){
   var data = JSON.parse(req.params.specs);
   var times = data.times;
@@ -138,6 +139,7 @@ router.get('/candidates/:specs', function(req, res, next){
   });
 });
 
+// subscribe a user to a travel
 router.get('/add/:travel_id/:uid', function(req, res, next){
   var user_id = req.params.uid;
 
@@ -163,6 +165,7 @@ router.get('/add/:travel_id/:uid', function(req, res, next){
   })
 });
 
+// unsubscribe a user from a travel
 router.get('/remove/:travel_id/:uid', function(req, res, next){
   var user_id = req.params.uid;
 
@@ -215,11 +218,11 @@ router.get('/dummy', function(req, res, next){
   res.json('adding travels');
 });
 
-// get close events
-router.get('/inrange/:lon/:lat', function(req, res, next){
+// get close events, inside the specified radius
+router.get('/inrange/:lon/:lat/:radius', function(req, res, next){
   var lon = parseFloat(req.params.lon);
   var lat = parseFloat(req.params.lat);
-
+  var radius = parseFloat(req.params.radius);
   Travel.find({}).populate('place').exec(function(err,travels){
 
     if (err) throw err;
@@ -229,7 +232,7 @@ router.get('/inrange/:lon/:lat', function(req, res, next){
       var p = travels[i].place;
       console.log(p);
       if (p){
-        if ( (p.lon-lon)*(p.lon-lon) + (p.lat-lat)*(p.lat-lat) < 25 ){
+        if ( (p.lon-lon)*(p.lon-lon) + (p.lat-lat)*(p.lat-lat) < radius*radius ){
           closeTravels.push(travels[i]);
         }  
       }

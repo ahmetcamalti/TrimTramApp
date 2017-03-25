@@ -69,6 +69,7 @@ router.get('/dummy', function(req, res, next){
  	//res.json('adding 10 places');
 });
 
+// delete all the places
 router.get('/clear', function(req, res, next){
 	Place.remove({},function(err, removed){
   	if(err) throw err;
@@ -76,7 +77,8 @@ router.get('/clear', function(req, res, next){
   });
 });
 
-router.get('/:title', function(req, res, next){
+// get places by name (title)
+router.get('/byName/:title', function(req, res, next){
 	Place.find({title:req.params.title}, function(err, place){
 		res.json(place);
 	});
