@@ -119,12 +119,12 @@ router.get('/clear', function(req, res, next) {
 router.get('/candidates/:specs', function(req, res, next){
   var data = JSON.parse(req.params.specs);
   var times = data.times;
-  var places = data.places;
+  var places = new Array(data.places.length);
 
-  console.log(places);
+  console.log(data.places);
 
   for (var i = 0; i < data.places.length; i++){
-    places[i] = mongoose.Schema.Types.ObjectId(data.places[i]);
+    places[i] = mongoose.Types.ObjectId(data.places[i]);
   }
 
   console.log(times);
