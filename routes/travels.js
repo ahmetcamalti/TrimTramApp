@@ -11,7 +11,7 @@ router.get('/getAllTravels', function(req, res, next) {
 
     // save the result into the response object.
     res.json(result);
-  });
+  }).populate('Place');
 });
 
 /* add new travel */
