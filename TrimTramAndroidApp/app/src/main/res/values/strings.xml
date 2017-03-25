@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">TrimTram Android Uygulaması</string>
+    <string name="app_name">TrimTram Android Application</string>
+
+    <!-- Sign In Activity String -->
+    <string name="prompt_username">Username</string>
+    <string name="btn_sign_In">Sign In</string>
+    <string name="error_field_required">This field is required!</string>
 </resources>
