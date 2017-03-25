@@ -9,11 +9,24 @@ var helpers = require('../helpers');
 router.get('/getAllTravels', function(req, res, next) {
   // get all the travels
   Travel.find({}, function(err, result) {
-    if (err) throw err;
-
-    // save the result into the response object.
-    res.json(result);
-  });
+    if (err) {
+      // error feedback for client
+      response = {
+        success: 0,
+        message: "There is an error in database!",
+      };
+    } else {
+      // save the result into the response object for client.
+      response = {
+        success: 1,
+        message: "Fetched all travels data with success",
+        travels: result
+      };
+    }
+    res.json(response);
+  })
+  .populate('Place')
+  .populate('User');
 });
 
 
@@ -134,6 +147,11 @@ router.get('/addUser/:uid', function(req, res, next){
     }else{
       console.log('user already going to event');
       res.json('user already going to event');
+        console.log()
+        res.json(tr);
+      });
+    }else{
+      going_cnt--;
     }
 
   })

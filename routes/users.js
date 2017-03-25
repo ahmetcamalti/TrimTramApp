@@ -110,6 +110,7 @@ router.get('/myTravels/:u_name/:p_key', function(req, res, next){
   });
 });
 
+<<<<<<< HEAD
 // generates dummy users
 router.get('/dummy', function(req, res, next){
 
@@ -132,6 +133,10 @@ router.get('/dummy', function(req, res, next){
 
   res.json('adding 10 users');
 
+=======
+router.get('/deneme', function(req, res, next){
+  res.json('hack');
+>>>>>>> ee5979f2615c0fc2ceb70a921ad990ba0332dcd4
 });
 
 module.exports = router;

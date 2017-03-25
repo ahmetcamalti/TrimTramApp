@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TrimTram Android Uygulaması</string>
+
+    <!-- Sign In Activity String -->
+    <string name="prompt_username">Kullanıcı Adı</string>
+    <string name="btn_sign_In">Giriş</string>
+    <string name="error_field_required">Bu alan zorunludur!</string>
+</resources>
