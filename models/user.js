@@ -8,7 +8,7 @@ var userSchema = new Schema({
   private_key: String,
   travels: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'travel'
+    ref: 'Travel'
   }]
 });
 

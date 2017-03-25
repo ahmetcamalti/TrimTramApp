@@ -86,4 +86,28 @@ router.get('/removeAllUser', function(req, res, next) {
   });
 });
 
+// get my travels
+router.get('/myTravels/:u_name/:p_key', function(req, res, next){
+
+  var username = req.params.u_name;
+  var private_key = req.params.p_key;
+
+  User.findOne({username: username, private_key:private_key}).populate('travels').exec()
+  .then(function(user){
+    res.json(user.travels);
+  })
+  .then(undefined, function(err){
+    //Handle error
+    console.log('error in myTravels/:u_name:/:p_key');
+    res.json('error in myTravels');
+  });
+
+  
+});
+
+router.get('/deneme', function(req, res, next){
+
+  res.json('hack');
+});
+
 module.exports = router;
