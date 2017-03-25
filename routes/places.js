@@ -27,11 +27,11 @@ router.get('/dummy', function(req, res, next){
 	var loaded = new Promise(function(resolve, reject){
 		Promise.each(places, function(p){
 			var title = "place " + p;
-			var lat = p * p + p + "";
-			var long = 2*p*p + 1 + "";
-			var newPlace = Place({title: title, lat:lat, long:long});
+			var lat = p * p + p; 		// just a random number
+			var lon = 2*p*p + 1;		// just a random number
+			var newPlace = Place({title: title, lat:lat, lon:lon});
 			cnt++;
-			if (cnt == places.length){
+			if (cnt == places.length-1){
 				resolve();
 			}
 			return newPlace.save()
@@ -47,7 +47,7 @@ router.get('/dummy', function(req, res, next){
 	.then(undefined, function(err){
     //Handle error
     if (err){
-    	console.log('error in dummy travels');
+    	console.log('error in dummy places');
     	res.json('error in dummy');	
     }
   });
@@ -66,7 +66,7 @@ router.get('/dummy', function(req, res, next){
  	}*/
 
 
- 	res.json('adding 10 places');
+ 	//res.json('adding 10 places');
 });
 
 router.get('/clear', function(req, res, next){

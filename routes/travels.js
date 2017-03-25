@@ -9,7 +9,10 @@ var helpers = require('../helpers');
 /* GET travel listing. */
 router.get('/all', function(req, res, next) {
   // get all the travels
-  Travel.find({}, function(err, result) {
+  Travel.find({})
+  .populate('place')
+  .populate('users')
+  .exec(function(err, result) {
     if (err) {
       // error feedback for client
       response = {
@@ -25,12 +28,8 @@ router.get('/all', function(req, res, next) {
       };
     }
     res.json(response);
-  })
-  .populate('Place')
-  .populate('User');
+  });
 });
-
-
 
 /* add new travel */
 router.get('/addTravel/:travelData', function(req, res, next) {
@@ -125,7 +124,7 @@ router.get('/candidates/:specs', function(req, res, next){
   console.log(places);
 
   for (var i = 0; i < data.places.length; i++){
-    places[i] = mongoose.Types.ObjectId(data.places[i]);
+    places[i] = mongoose.Schema.Types.ObjectId(data.places[i]);
   }
 
   console.log(times);
@@ -199,7 +198,10 @@ router.get('/dummy', function(req, res, next){
       if (err) throw err;
       var tit = helpers.dummy_event_names[helpers.getRandomInt(0,3)];
       var time = helpers.getRandomInt(0,23);
-      var travel = Travel({title: tit, time: time, place: mongoose.Types.ObjectId(results._id), going_cnt:0});
+      
+      results = results[0];
+
+      var travel = Travel({title: tit, time: time, place: results, going_cnt:0});
       travel.save(function(err, t){
         if (err) {
           console.log('error in dummy travel generation');
@@ -211,6 +213,29 @@ router.get('/dummy', function(req, res, next){
     });
   }
   res.json('adding travels');
+});
+
+// get close events
+router.get('/inrange/:lon/:lat', function(req, res, next){
+  var lon = parseFloat(req.params.lon);
+  var lat = parseFloat(req.params.lat);
+
+  Travel.find({}).populate('place').exec(function(err,travels){
+
+    if (err) throw err;
+
+    var closeTravels = [];
+    for (var i = 0; i < travels.length; i++){
+      var p = travels[i].place;
+      console.log(p);
+      if (p){
+        if ( (p.lon-lon)*(p.lon-lon) + (p.lat-lat)*(p.lat-lat) < 25 ){
+          closeTravels.push(travels[i]);
+        }  
+      }
+    }
+    res.json(closeTravels);
+  });
 });
 
 module.exports = router;

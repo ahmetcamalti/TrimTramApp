@@ -6,8 +6,8 @@ var random = require('mongoose-simple-random');
 // create a schema
 var placeSchema = new Schema({
   title: String,
-  lat:String,
-  lon:String
+  lat:Number,
+  lon:Number
 });
 
 // the schema is useless so far
