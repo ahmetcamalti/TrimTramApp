@@ -6,10 +6,7 @@ var Schema = mongoose.Schema;
 var travelSchema = new Schema({
   title: String,
   time: String,
-  places: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'place'
-  }],
+  places: String,
   users: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user'
