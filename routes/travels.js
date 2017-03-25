@@ -99,4 +99,43 @@ router.get('/removeAllTravels', function(req, res, next) {
   });
 });
 
+router.get('/candidates/:specs', function(req, res, next){
+  var data = JSON.parse(req.params.specs);
+  var times = data.times;
+  var places = data.places;
+
+
+  Travel.find({time: {$in: times}, place: {$in:places}}, function(err, result){
+    if(err) throw err;
+    console.log(result);
+
+    res.json(result);
+  });
+});
+
+router.get('/addUser/:uid', function(req, res, next){
+  var user_id = req.params.uid;
+
+  Travel.findById(user_id).exec()
+  .then(function(travel){
+
+    if (travel.users.indexOf(user_id) == -1){
+      travel.users.push(user_id);
+      travel.going_cnt = travel.going_cnt + 1;
+      travel.save(function(err, tr){
+        if (err) throw err;
+        console.log()
+        res.json(tr);
+      });
+    }else{
+      going_cnt
+    }
+
+  })
+  .then(undefined, function(err){
+    //Handle error
+    console.log(err);
+  })
+});
+
 module.exports = router;

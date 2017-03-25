@@ -58,4 +58,10 @@ router.get('/clear', function(req, res, next){
   });
 });
 
+router.get('/:title', function(req, res, next){
+	Place.find({title:req.params.title}, function(err, place){
+		res.json(place);
+	});
+});
+
 module.exports = router;

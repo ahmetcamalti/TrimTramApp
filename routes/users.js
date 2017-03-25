@@ -101,12 +101,9 @@ router.get('/myTravels/:u_name/:p_key', function(req, res, next){
     console.log('error in myTravels/:u_name:/:p_key');
     res.json('error in myTravels');
   });
-
-  
 });
 
 router.get('/deneme', function(req, res, next){
-
   res.json('hack');
 });
 

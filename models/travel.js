@@ -5,12 +5,16 @@ var Schema = mongoose.Schema;
 // create a schema
 var travelSchema = new Schema({
   title: String,
-  time: String,
-  place: String,
+  time: Number,
+  place: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Place'
+  },
   users: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
-  }]
+  }],
+  going_cnt: Number
 });
 
 // the schema is useless so far
