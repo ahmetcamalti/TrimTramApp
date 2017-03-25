@@ -142,8 +142,4 @@ router.get('/dummy', function(req, res, next){
   res.json('adding 10 users');
 });
 
-router.get('/deneme', function(req, res, next){
-  res.json('hack');
-});
-
 module.exports = router;
