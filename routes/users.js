@@ -39,7 +39,7 @@ router.get('/addUser/:username', function(req, res, next) {
   }
 
   // create a new user
-  var newUser = generateNewUser(username);
+  var newUser = generateNewUser(req.params.username);
 
   // save the user
   newUser.save(function(err, user) {
