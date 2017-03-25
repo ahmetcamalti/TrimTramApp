@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 
 var Travel = require('../models/travel');
+var Place = require('../models/place');
+var helpers = require('../helpers');
 
 /* GET travel listing. */
 router.get('/getAllTravels', function(req, res, next) {
@@ -13,6 +15,8 @@ router.get('/getAllTravels', function(req, res, next) {
     res.json(result);
   });
 });
+
+
 
 /* add new travel */
 router.get('/addTravel/:travelData', function(req, res, next) {
@@ -97,6 +101,95 @@ router.get('/removeAllTravels', function(req, res, next) {
 
     res.json(response);
   });
+});
+
+router.get('/candidates/:specs', function(req, res, next){
+  var data = JSON.parse(req.params.specs);
+  var times = data.times;
+  var places = data.places;
+
+
+  Travel.find({time: {$in: times}, place: {$in:places}}, function(err, result){
+    if(err) throw err;
+    console.log(result);
+
+    res.json(result);
+  });
+});
+
+router.get('/addUser/:uid', function(req, res, next){
+  var user_id = req.params.uid;
+
+  Travel.findById(user_id).exec()
+  .then(function(travel){
+
+    if (travel.users.indexOf(user_id) == -1){
+      travel.users.push(user_id);
+      travel.going_cnt = travel.going_cnt + 1;
+      travel.save(function(err, tr){
+        if (err) throw err;
+        console.log('added user to travel');
+        res.json(tr);
+      });
+    }else{
+      console.log('user already going to event');
+      res.json('user already going to event');
+    }
+
+  })
+  .then(undefined, function(err){
+    //Handle error
+    console.log(err);
+  })
+});
+
+router.get('/removeUser/:uid', function(req, res, next){
+  var user_id = req.params.uid;
+
+  Travel.findById(user_id).exec()
+  .then(function(travel){
+
+    if (travel.users.indexOf(user_id) == -1){
+      console.log('user already not going to event');
+      res.json('user already going to event');
+    }else{
+      travel.users.pull(user_id);
+      travel.going_cnt = travel.going_cnt - 1;
+      travel.save(function(err, tr){
+        if (err) throw err;
+        console.log('removed user from travel');
+        res.json(tr);
+      });
+    }
+
+  })
+  .then(undefined, function(err){
+    //Handle error
+    console.log(err);
+  })
+});
+
+// generates dummy travels
+router.get('/dummy', function(req, res, next){
+  
+  for (var i = 0; i < 10; i++){
+    
+    Place.findRandom({},{},{limit:1},function(err, results){
+      if (err) throw err;
+      var tit = helpers.dummy_event_names[helpers.getRandomInt(0,3)];
+      var time = helpers.getRandomInt(0,23);
+      var travel = Travel({title: tit, time: time, place: results._id, going_cnt:0});
+      travel.save(function(err, t){
+        if (err) {
+          console.log('error in dummy travel generation');
+        }
+        if (i == 9){
+          console.log("added 10 travels");
+        }
+      });
+    });
+  }
+  res.json('adding travels');
 });
 
 module.exports = router;

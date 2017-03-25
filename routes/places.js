@@ -46,9 +46,27 @@ router.get('/dummy', function(req, res, next){
 	})
 	.then(undefined, function(err){
     //Handle error
-    console.log('error in dummy travels');
-    res.json('error in dummy');
+    if (err){
+    	console.log('error in dummy travels');
+    	res.json('error in dummy');	
+    }
   });
+
+ 	/*for (var i = 0; i < 10; i++){
+ 		var title = "place " + i;
+ 		var lat = i* i + i + "";
+		var long = 2*i*i + 1 + "";
+		var newPlace = Place({title: title, lat:lat, long:long});
+		newPlace.save(function(err, place){
+			if (err) throw err;
+			if (i == 9){
+				console.log('added 10 places');
+			}
+		});
+ 	}*/
+
+
+ 	res.json('adding 10 places');
 });
 
 router.get('/clear', function(req, res, next){
@@ -56,6 +74,12 @@ router.get('/clear', function(req, res, next){
   	if(err) throw err;
   	res.json(removed);
   });
+});
+
+router.get('/:title', function(req, res, next){
+	Place.find({title:req.params.title}, function(err, place){
+		res.json(place);
+	});
 });
 
 module.exports = router;

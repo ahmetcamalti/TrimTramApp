@@ -1,9 +1,19 @@
 var express = require('express');
 var rand = require("random-key");
+var random_name = require('node-random-name');
 var router = express.Router();
 
 var User = require('../models/user');
+var Travel = require('../models/travel');
+
 const crypto = require('crypto');
+
+function generateNewUser(username, travels){
+  if (travels)
+    return User({username: username, private_key: rand.generate(), travels:travels});
+  else
+    return User({username: username, private_key: rand.generate()});
+}
 
 /* GET users listing. */
 router.get('/allUser', function(req, res, next) {
@@ -29,10 +39,7 @@ router.get('/addUser/:username', function(req, res, next) {
   }
 
   // create a new user
-  var newUser = User({
-    username: req.params.username,
-    private_key: rand.generate()
-  });
+  var newUser = generateNewUser(username);
 
   // save the user
   newUser.save(function(err, user) {
@@ -101,13 +108,30 @@ router.get('/myTravels/:u_name/:p_key', function(req, res, next){
     console.log('error in myTravels/:u_name:/:p_key');
     res.json('error in myTravels');
   });
-
-  
 });
 
-router.get('/deneme', function(req, res, next){
+// generates dummy users
+router.get('/dummy', function(req, res, next){
 
-  res.json('hack');
+  for (var i = 0; i < 10; i++){
+    
+    Travel.findRandom({},{},{limit:3},function(err, results){
+      if (err) throw err;
+      var uname = random_name();
+      var u = generateNewUser(uname, results);
+      u.save(function(err, user){
+        if (err) {
+          console.log('error in dummy user generation');
+        }
+        if (i == 9){
+          console.log("added 10 users");
+        }
+      });
+    });
+  }
+
+  res.json('adding 10 users');
+
 });
 
 module.exports = router;
