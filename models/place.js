@@ -11,7 +11,7 @@ var placeSchema = new Schema({
 
 // the schema is useless so far
 // we need to create a model using it
-var Place = mongoose.model('Place', travelSchema);
+var Place = mongoose.model('Place', placeSchema);
 
 // make this available in our Node applications
 module.exports = Place;
