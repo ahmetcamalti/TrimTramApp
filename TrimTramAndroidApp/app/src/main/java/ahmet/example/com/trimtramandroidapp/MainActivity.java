@@ -94,6 +94,12 @@ public class MainActivity extends AppCompatActivity {
             Log.v("TheTravel", theTravel.getTitle());
 
             TableRow travelRow = (TableRow) View.inflate(MainActivity.this, R.layout.tablerow_travel, null);
+            TableLayout.LayoutParams lp =
+                    new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,
+                            TableLayout.LayoutParams.WRAP_CONTENT);
+
+            lp.setMargins(0, 25, 0, 0);
+            travelRow.setLayoutParams(lp);
 
             TextView travelTitleTextView = (TextView) travelRow.findViewById(R.id.textview_travel_title);
             TextView travelTimeTextView = (TextView) travelRow.findViewById(R.id.textview_time);
@@ -104,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
             travelPlacesTextView.setText(theTravel.getPlace().getTitle());
 
             // add row to table layout
-            travelsTableLayout.addView(travelRow);
+            travelsTableLayout.addView(travelRow, lp);
         }
     }
 
@@ -117,7 +123,8 @@ public class MainActivity extends AppCompatActivity {
 
         private String serverMessage;
 
-        GetAllTravels() {}
+        GetAllTravels() {
+        }
 
         @Override
         protected Boolean doInBackground(Void... params) {
