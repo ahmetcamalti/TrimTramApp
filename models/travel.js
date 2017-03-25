@@ -9,7 +9,7 @@ var travelSchema = new Schema({
   place: String,
   users: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'user'
+    ref: 'User'
   }]
 });
 

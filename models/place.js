@@ -3,18 +3,15 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 // create a schema
-var userSchema = new Schema({
-  username: String,
-  private_key: String,
-  travels: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Travel'
-  }]
+var placeSchema = new Schema({
+  title: String,
+  lat:String,
+  long:String
 });
 
 // the schema is useless so far
 // we need to create a model using it
-var User = mongoose.model('User', userSchema);
+var Place = mongoose.model('Place', placeSchema);
 
 // make this available in our Node applications
-module.exports = User;
+module.exports = Place;
