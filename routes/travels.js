@@ -147,13 +147,7 @@ router.get('/addUser/:uid', function(req, res, next){
     }else{
       console.log('user already going to event');
       res.json('user already going to event');
-        console.log()
-        res.json(tr);
-      });
-    }else{
-      going_cnt--;
     }
-
   })
   .then(undefined, function(err){
     //Handle error
