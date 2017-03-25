@@ -4,7 +4,7 @@ var router = express.Router();
 var Travel = require('../models/travel');
 
 /* GET travel listing. */
-router.get('/allTravel', function(req, res, next) {
+router.get('/getAllTravels', function(req, res, next) {
   // get all the travels
   Travel.find({}, function(err, result) {
     if (err) throw err;
@@ -51,10 +51,25 @@ router.get('/addTravel/:travelData', function(req, res, next) {
   });
 });
 
-/* remove all travels */
-router.get('/removeAllTravel', function(req, res, next) {
+/* get travel by places */
+router.get('/getTravelByPlace/:place', function(req, res, next) {
+  // create json objset from string
+  var thePlace = req.params.place;
 
-  User.remove({}, function(err, result) {
+  // get all the travels filtering by places
+  Travel.find({place: thePlace}).exec()
+  .then(function(travels){
+    res.json(travels);
+  })
+  .then(undefined, function(err){
+    //Handle error
+  })
+});
+
+/* remove all travels */
+router.get('/removeAllTravels', function(req, res, next) {
+
+  Travel.remove({}, function(err, result) {
     // remove all travels from database
     if (err) {
       var message = "There is an error on database";
