@@ -8,7 +8,7 @@ var Place = require('../models/place');
 Place = Promise.promisifyAll(Place)
 
 /* GET place listing. */
-router.get('/allPlace', function(req, res, next) {
+router.get('/all', function(req, res, next) {
   // get all the places
   Place.find({}, function(err, result) {
     if (err) throw err;

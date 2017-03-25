@@ -16,7 +16,7 @@ function generateNewUser(username, travels){
 }
 
 /* GET users listing. */
-router.get('/allUser', function(req, res, next) {
+router.get('/all', function(req, res, next) {
   // get all the users
   User.find({}, function(err, result) {
     if (err) throw err;
@@ -61,7 +61,7 @@ router.get('/addUser/:username', function(req, res, next) {
 });
 
 /* remove all users */
-router.get('/removeAllUser', function(req, res, next) {
+router.get('/clear', function(req, res, next) {
   // get all the users
   User.remove({}, function(err, result) {
     // remove all budgeds data
@@ -125,6 +125,15 @@ router.get('/dummy', function(req, res, next){
         }
         if (i == 9){
           console.log("added 10 users");
+        }
+        for ( var j = 0; j < results.length; j++){
+          var r = results[j];
+          r.users.push(u._id);
+          r.going_cnt = r.going_cnt + 1;
+          r.save(function(err, re){
+            if (err) throw err;
+            console.log('user added to travel');
+          });
         }
       });
     });

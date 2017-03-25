@@ -1,12 +1,13 @@
 var express = require('express');
 var router = express.Router();
+var mongoose = require('mongoose');
 
 var Travel = require('../models/travel');
 var Place = require('../models/place');
 var helpers = require('../helpers');
 
 /* GET travel listing. */
-router.get('/getAllTravels', function(req, res, next) {
+router.get('/all', function(req, res, next) {
   // get all the travels
   Travel.find({}, function(err, result) {
     if (err) {
@@ -84,7 +85,7 @@ router.get('/getTravelByPlace/:place', function(req, res, next) {
 });
 
 /* remove all travels */
-router.get('/removeAllTravels', function(req, res, next) {
+router.get('/clear', function(req, res, next) {
 
   Travel.remove({}, function(err, result) {
     // remove all travels from database
@@ -121,6 +122,14 @@ router.get('/candidates/:specs', function(req, res, next){
   var times = data.times;
   var places = data.places;
 
+  console.log(places);
+
+  for (var i = 0; i < data.places.length; i++){
+    places[i] = mongoose.Types.ObjectId(data.places[i]);
+  }
+
+  console.log(times);
+  console.log(places);
 
   Travel.find({time: {$in: times}, place: {$in:places}}, function(err, result){
     if(err) throw err;
@@ -130,10 +139,10 @@ router.get('/candidates/:specs', function(req, res, next){
   });
 });
 
-router.get('/addUser/:uid', function(req, res, next){
+router.get('/add/:travel_id/:uid', function(req, res, next){
   var user_id = req.params.uid;
 
-  Travel.findById(user_id).exec()
+  Travel.findById(req.params.travel_id).exec()
   .then(function(travel){
 
     if (travel.users.indexOf(user_id) == -1){
@@ -155,10 +164,10 @@ router.get('/addUser/:uid', function(req, res, next){
   })
 });
 
-router.get('/removeUser/:uid', function(req, res, next){
+router.get('/remove/:travel_id/:uid', function(req, res, next){
   var user_id = req.params.uid;
 
-  Travel.findById(user_id).exec()
+  Travel.findById(req.params.travel_id).exec()
   .then(function(travel){
 
     if (travel.users.indexOf(user_id) == -1){
@@ -190,7 +199,7 @@ router.get('/dummy', function(req, res, next){
       if (err) throw err;
       var tit = helpers.dummy_event_names[helpers.getRandomInt(0,3)];
       var time = helpers.getRandomInt(0,23);
-      var travel = Travel({title: tit, time: time, place: results._id, going_cnt:0});
+      var travel = Travel({title: tit, time: time, place: mongoose.Types.ObjectId(results._id), going_cnt:0});
       travel.save(function(err, t){
         if (err) {
           console.log('error in dummy travel generation');
