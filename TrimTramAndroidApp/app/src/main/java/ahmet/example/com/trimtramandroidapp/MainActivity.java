@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
 
     private AsyncTaskModuler moduler;
 
-    private FloatingActionButton fab;
+    private FloatingActionButton searchTravelsButton;
     private FloatingActionButton myTravelsButton;
 
     // Shared preferences name;
@@ -41,10 +41,10 @@ public class MainActivity extends AppCompatActivity {
         currentUserId = session.getString("user_id", null);
 
         // init floating action button
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setVisibility(View.GONE);
+        searchTravelsButton = (FloatingActionButton) findViewById(R.id.searchTravels);
+        searchTravelsButton.setVisibility(View.GONE);
         // set onclick listener to fab button
-        fab.setOnClickListener(new View.OnClickListener() {
+        searchTravelsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 moduler.cancel(true);
@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onCompleteListener(String response) {
-            fab.setVisibility(View.VISIBLE);
+            searchTravelsButton.setVisibility(View.VISIBLE);
             myTravelsButton.setVisibility(View.VISIBLE);
 
             try {
