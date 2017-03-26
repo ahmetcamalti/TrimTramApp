@@ -142,14 +142,14 @@ router.get('/candidates/:specs', function(req, res, next){
 // subscribe a user to a travel
 router.get('/add/:travel_id/:uid', function(req, res, next){
   var user_id = req.params.uid;
-
-  Travel.findById(req.params.travel_id).exec()
-  .then(function(travel){
-
-    if (travel.users.indexOf(user_id) == -1){
+  var response;
+  Travel.findById(req.params.travel_id).exec(function(err0, travel){
+    if (err0){
+      response = helpers.respond(0, err0);
+      console.log(response);
+    }else if (travel.users.indexOf(user_id) == -1){
       travel.users.push(user_id);
       travel.going_cnt = travel.going_cnt + 1;
-      var response;
       travel.save(function(err, tr){
         if (err){
           response = helpers.respond(0, err);
@@ -157,7 +157,7 @@ router.get('/add/:travel_id/:uid', function(req, res, next){
         }else{
           User.findById(user_id).exec(function(err, result){
             if (err){
-              response = helpers.respond(1, 'finding user error', tr);  
+              response = helpers.respond(0, 'finding user error', tr);  
             }else{
               result.travels.push(travel_id);
               result.save(function(err, use){
@@ -166,6 +166,7 @@ router.get('/add/:travel_id/:uid', function(req, res, next){
                   console.log(response);
                 }else{
                   response = helpers.respond(1, 'added user to travel', use);
+                  console.log(response);
                 }
               });
             }
@@ -174,28 +175,26 @@ router.get('/add/:travel_id/:uid', function(req, res, next){
       });
     }else{
       response = helpers.respond(0, 'user already going to event');
+      console.log(response);
     }
-  })
-  .then(undefined, function(err){
-    //Handle error
-    response = helpers.respond(0, err);
-    console.log(response);
-  })
-
-  res.json(response);
+    res.json(response);
+  });
 });
 
 // unsubscribe a user from a travel
 router.get('/remove/:travel_id/:uid', function(req, res, next){
   var user_id = req.params.uid;
 
-  Travel.findById(req.params.travel_id).exec()
-  .then(function(travel){
+  Travel.findById(req.params.travel_id, function(err, travel){
     var response;
-    if (travel.users.indexOf(user_id) == -1){
-      response = respond(0, 'user already going to event');
+    if (err){
+      response = respond(0, 'err when finding ');
       console.log(response);
-    }else{
+    }else if (travel.users.indexOf(user_id) == -1){
+      response = respond(0, 'user already NOT going to event');
+      console.log(response);
+    }
+    else{
       travel.users.pull(user_id);
       travel.going_cnt = travel.going_cnt - 1;
       travel.save(function(err, tr){
@@ -223,15 +222,8 @@ router.get('/remove/:travel_id/:uid', function(req, res, next){
         }
       });
     }
-
-  })
-  .then(undefined, function(err){
-    //Handle error
-    response = respond(0, err);
-    console.log(err);
-  })
-
-  res.json(response);
+    res.json(response);
+  });
 });
 
 // generates dummy travels
