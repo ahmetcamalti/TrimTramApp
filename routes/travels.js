@@ -189,23 +189,27 @@ router.get('/add/:travel_id/:uid', function(req, res, next){
 // unsubscribe a user from a travel
 router.get('/remove/:travel_id/:uid', function(req, res, next){
   var user_id = req.params.uid;
+  var travel_id = req.params.travel_id;
 
-  Travel.findById(req.params.travel_id, function(err, travel){
+  Travel.findById(travel_id, function(err, travel){
     var response;
     if (err){
-      response = respond(0, 'err when finding ');
+      response = helpers.respond(0, 'err when finding ');
       console.log(response);
+      res.json(response);
     }else if (travel.users.indexOf(user_id) == -1){
-      response = respond(0, 'user already NOT going to event');
+      response = helpers.respond(0, 'user already NOT going to event');
       console.log(response);
+      res.json(response);
     }
     else{
       travel.users.pull(user_id);
       travel.going_cnt = travel.going_cnt - 1;
       travel.save(function(err, tr){
         if (err){
-          response = respond(0, err);
+          response = helpers.respond(0, err);
           console.log(response);
+          res.json(response);
         }
         else{
           User.findById(user_id).exec(function(err, us){
@@ -216,18 +220,18 @@ router.get('/remove/:travel_id/:uid', function(req, res, next){
               us.travels.pull(travel_id);
               us.save(function(err, use){
                 if(err){
-                  response = respond(0, err);
+                  response = helpers.respond(0, err);
                   console.log(response);
                 }else{
                   response = helpers.respond(1, 'added user to travel', use);
                 }
               });
             }
+            res.json(response);
           });
         }
       });
     }
-    res.json(response);
   });
 });
 
