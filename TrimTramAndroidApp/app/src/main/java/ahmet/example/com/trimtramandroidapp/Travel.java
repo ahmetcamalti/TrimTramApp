@@ -112,7 +112,7 @@ public class Travel {
         JSONObject travel = new JSONObject(jsonData);
 
         // set id of travel object
-        this.setId(travel.getString("id"));
+        this.setId(travel.getString("_id"));
         // set title of travel object
         this.setTitle(travel.getString("title"));
         // set time of travel object
@@ -121,36 +121,54 @@ public class Travel {
         // get place data as string
         String placeDataString = travel.getString("place");
 
-        // create place object
-        Place thePlace = new Place();
-        // set place data from json string
-        thePlace.createFromJSONString(placeDataString);
+        // this is not a solution just by pass for one thing (MyTravelsActivity) :)
+        if (placeDataString.length() > 24) {
+            // create place object
+            Place thePlace = new Place();
+            // set place data from json string
+            thePlace.createFromJSONString(placeDataString);
 
-        // set place of travel object
-        this.setPlace(thePlace);
+            // set place of travel object
+            this.setPlace(thePlace);
+        } else {
+            this.setPlace(null);
+        }
 
         // set users of travel object
+
         ArrayList<User> users = new ArrayList<User>();
         if (travel.has("users")) {
             JSONArray usersJSON = travel.getJSONArray("users");
+
             for (int i = 0; i < usersJSON.length(); i++) {
-                // create user object
-                User theUser = new User();
                 // create user data string
                 String userDataString = usersJSON.getString(i);
-                // create user object from json string
-                theUser.createFromJSONString(userDataString);
 
-                if (currentUserId == theUser.getId())
-                    this.setCurrentUserIsJoined(true);
+                // this is not a solution just by pass for one thing (MyTravelsActivity) :)
+                if(userDataString.length() > 25) {
+                    // create user object
+                    User theUser = new User();
 
-                // add user object to array lsit
-                users.add(theUser);
+                    // create user object from json string
+                    theUser.createFromJSONString(userDataString);
+
+                    // sign to user joined or not
+                    if (currentUserId == theUser.getId())
+                        this.setCurrentUserIsJoined(true);
+                    else
+                        this.setCurrentUserIsJoined(false);
+
+                    // add user object to array lsit
+                    users.add(theUser);
+                } else {
+                    users.add(null);
+                }
             }
         }
 
         // set user array list of travel object
         this.setUsers(users);
+        this.setUsers(null);
     }
 
     @Override

@@ -14,4 +14,5 @@
 
 
     <string name="table_row_action">KATIL</string>
+    <string name="table_row_action_true">ÇIKAR</string>
 </resources>

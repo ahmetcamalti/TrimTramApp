@@ -2,6 +2,7 @@ package ahmet.example.com.trimtramandroidapp;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -13,7 +14,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by Ahmet on 26-Mar-17.
@@ -36,12 +36,14 @@ public class TravelTable {
             // if there is an error on server, return
             String serverMessage = serverResponse.getString("message");
 
+            // give feedback to user
             Toast.makeText(this.theActivity, serverMessage,
                     Toast.LENGTH_LONG).show();
 
             return;
         }
 
+        // convert to travels data to json array
         JSONArray travelsData = serverResponse.getJSONArray("data");
 
         // travel all array rows
@@ -56,17 +58,19 @@ public class TravelTable {
             travels.add(theTravel);
         }
 
+        // travels table layout
         TableLayout travelsTableLayout = (TableLayout) this.theActivity.findViewById(R.id.table_travels);
-        travelsTableLayout.removeAllViews();
 
         for (int i = 0; i < travels.size(); i++) {
             final Travel theTravel = travels.get(i);
 
+            // inflate travel row table row layout
             TableRow travelRow = (TableRow) View.inflate(this.theActivity, R.layout.tablerow_travel, null);
             TableLayout.LayoutParams lp =
                     new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,
                             TableLayout.LayoutParams.WRAP_CONTENT);
 
+            // add some margin beetwen rows
             lp.setMargins(0, 25, 0, 0);
             travelRow.setLayoutParams(lp);
 
@@ -77,18 +81,31 @@ public class TravelTable {
 
             travelTitleTextView.setText(theTravel.getTitle());
             travelTimeTextView.setText(Integer.toString(theTravel.getTime()));
-            travelPlacesTextView.setText(theTravel.getPlace().getTitle());
-            travelActionTextView.setText("JOIN");
 
-            if (theTravel.getCurrentUserIsJoined() == false) {
+            // check object exist or null
+            if (theTravel.getPlace() != null)
+                travelPlacesTextView.setText(theTravel.getPlace().getTitle());
+
+            if (theTravel.getCurrentUserIsJoined() != null &&  theTravel.getCurrentUserIsJoined() == false) {
+                // if current user didnt join this travel
+                travelActionTextView.setText(this.theActivity.getResources().getString(R.string.table_row_action));
+
                 travelActionTextView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        addUserToTravel(theTravel.getId(), currentUserId);
+                        updateUserToTravel("add", theTravel.getId(), currentUserId);
                     }
                 });
             } else {
+                // if current user joined this travel
+                travelActionTextView.setText(this.theActivity.getResources().getString(R.string.table_row_action_true));
 
+                travelActionTextView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        updateUserToTravel("remove", theTravel.getId(), currentUserId);
+                    }
+                });
             }
 
             // add row to table layout
@@ -96,10 +113,11 @@ public class TravelTable {
         }
     }
 
-    public void addUserToTravel(String travelId, String currentUserId) {
-        String url = "travels/add/" + travelId + "/" + currentUserId;
-        HashMap<String, String> data = new HashMap<String, String>();
-        AsyncTaskModuler moduler = new AsyncTaskModuler(this.theActivity, data, url, completeAddUserToTravel);
+    public void updateUserToTravel(String which, String travelId, String currentUserId) {
+        String url = "travels/" + which + "/" + travelId + "/" + currentUserId;
+        Log.e("updateUserURL", url);
+
+        AsyncTaskModuler moduler = new AsyncTaskModuler(this.theActivity, null, url, completeAddUserToTravel);
         moduler.execute();
     }
 
@@ -108,27 +126,22 @@ public class TravelTable {
         @Override
         public void onCompleteListener(String response) {
             try {
-                openTravelDetail(response);
+                openMyTravels(response);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
     };
 
-    public void openTravelDetail(String response) throws JSONException {
+    public void openMyTravels(String response) throws JSONException {
+        Log.e("updateUserTravel", response);
         // response convert to json object
         JSONObject serverResponse = new JSONObject(response);
 
         // get response success
         if (serverResponse.getInt("success") == 1) {
-            // get travel data
-            JSONObject travelData = serverResponse.getJSONObject("data");
-            // get travel id
-            String travelId = travelData.getString("_id");
-
             // open travel detail activity
-            Intent theIntent = new Intent(this.theActivity, TravelDetailActivity.class);
-            theIntent.putExtra("TRAVEL_ID", travelId);
+            Intent theIntent = new Intent(this.theActivity, MyTravelsActivity.class);
             theActivity.startActivity(theIntent);
         } else {
             // if there is an error on server

@@ -15,4 +15,5 @@
 
 
     <string name="table_row_action">JOIN</string>
+    <string name="table_row_action_true">DISCARD</string>
 </resources>
