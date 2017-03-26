@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -58,6 +59,18 @@ public class MainActivity extends AppCompatActivity {
             startActivity(theIntent);
         }
 
+        // init floating action button
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        // set onclick listener to fab button
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Click action
+                Intent intent = new Intent(MainActivity.this, EventFinderActivity.class);
+                startActivity(intent);
+            }
+        });
+
         // Show a progress spinner, and kick off a background task to
         progressView = (CircularProgressView) findViewById(R.id.progress_view);
         progressView.setIndeterminate(true);
@@ -70,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void addTravelsToUI(JSONObject json) throws JSONException {
         // create json array from json object
-        JSONArray travelsData = json.getJSONArray("travels");
+        JSONArray travelsData = json.getJSONArray("data");
 
         // travel all array rows
         for (int i = 0; i < travelsData.length(); i++) {
@@ -90,8 +103,6 @@ public class MainActivity extends AppCompatActivity {
 
         for (int i = 0; i < travels.size(); i++) {
             Travel theTravel = travels.get(i);
-
-            Log.v("TheTravel", theTravel.getTitle());
 
             TableRow travelRow = (TableRow) View.inflate(MainActivity.this, R.layout.tablerow_travel, null);
             TableLayout.LayoutParams lp =

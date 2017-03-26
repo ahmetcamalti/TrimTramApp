@@ -6,4 +6,9 @@
     <string name="prompt_username">Username</string>
     <string name="btn_sign_In">Sign In</string>
     <string name="error_field_required">This field is required!</string>
+
+    <!-- Event Finder Activity String -->
+    <string name="spinner_time">Time</string>
+    <string name="spinner_place">Place</string>
+    <string name="btn_travel_search">Find</string>
 </resources>
