@@ -4,6 +4,7 @@ var mongoose = require('mongoose');
 
 var Travel = require('../models/travel');
 var Place = require('../models/place');
+var User = require('../models/user');
 var helpers = require('../helpers');
 
 /* GET travel listing. */
@@ -154,7 +155,21 @@ router.get('/add/:travel_id/:uid', function(req, res, next){
           response = helpers.respond(0, err);
           console.log(response);
         }else{
-          response = helpers.respond(1, 'added user to travel', tr);  
+          User.findById(user_id).exec(function(err, result){
+            if (err){
+              response = helpers.respond(1, 'finding user error', tr);  
+            }else{
+              result.travels.push(travel_id);
+              result.save(function(err, use){
+                if(err){
+                  response = helpers.respond(0, err);
+                  console.log(response);
+                }else{
+                  response = helpers.respond(1, 'added user to travel', use);
+                }
+              });
+            }
+          });
         }
       });
     }else{
@@ -189,7 +204,22 @@ router.get('/remove/:travel_id/:uid', function(req, res, next){
           console.log(response);
         }
         else{
-          response = respond(1, err, tr);
+          User.findById(user_id).exec(function(err, us){
+            if(err){
+              response = respond(0, err);
+              console.log(response);
+            }else{
+              us.travels.pull(travel_id);
+              us.save(function(err, use){
+                if(err){
+                  response = respond(0, err);
+                  console.log(response);
+                }else{
+                  response = helpers.respond(1, 'added user to travel', use);
+                }
+              });
+            }
+          });
         }
       });
     }

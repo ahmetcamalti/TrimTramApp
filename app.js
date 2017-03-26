@@ -1,4 +1,3 @@
-// AIzaSyABHCE0M7OZuF96om2ejyYpXuUAs-FFWic
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -6,16 +5,23 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
-var config = require('./config');
+var redis = require('redis');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
 var travels = require('./routes/travels');
 var places = require('./routes/places');
+var config = require('./config');
 
 // connect to DB
 mongoose.connect(config.mongoUrl);
 mongoose.Promise = require('bluebird');
+
+var client = redis.createClient();
+
+client.on('connect', function() {
+    console.log('redis connected');
+});
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
