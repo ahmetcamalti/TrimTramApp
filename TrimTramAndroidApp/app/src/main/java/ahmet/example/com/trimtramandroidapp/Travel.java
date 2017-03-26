@@ -15,6 +15,7 @@ public class Travel {
     private int time;
     private Place place;
     private ArrayList<User> users;
+    private Boolean currentUserIsJoined;
 
     public Travel() {
     }
@@ -30,6 +31,16 @@ public class Travel {
         this.time = time;
         this.place = place;
         this.users = users;
+        this.currentUserIsJoined = false;
+    }
+
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
@@ -88,10 +99,20 @@ public class Travel {
         this.users = users;
     }
 
-    public void createFromJSONString(String jsonData) throws JSONException {
+    public Boolean getCurrentUserIsJoined() {
+        return currentUserIsJoined;
+    }
+
+    public void setCurrentUserIsJoined(Boolean currentUserIsJoined) {
+        this.currentUserIsJoined = currentUserIsJoined;
+    }
+
+    public void createFromJSONString(String jsonData, String currentUserId) throws JSONException {
         // convert travel string data to json object
         JSONObject travel = new JSONObject(jsonData);
 
+        // set id of travel object
+        this.setId(travel.getString("id"));
         // set title of travel object
         this.setTitle(travel.getString("title"));
         // set time of travel object
@@ -119,6 +140,10 @@ public class Travel {
                 String userDataString = usersJSON.getString(i);
                 // create user object from json string
                 theUser.createFromJSONString(userDataString);
+
+                if (currentUserId == theUser.getId())
+                    this.setCurrentUserIsJoined(true);
+
                 // add user object to array lsit
                 users.add(theUser);
             }

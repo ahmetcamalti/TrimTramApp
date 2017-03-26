@@ -2,7 +2,6 @@ package ahmet.example.com.trimtramandroidapp;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -11,30 +10,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.github.rahatarmanahmed.cpv.CircularProgressView;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import java.util.HashMap;
 
 public class SignInActivity extends AppCompatActivity {
 
     // username
     private String mUserName;
-
-    // SignIn Async Task
-    private SignIn mAuthTask = null;
-
-    // OkHttpClient Library
-    private OkHttpClient client = new OkHttpClient();
-
-    // CircularProgressView Library
-    private CircularProgressView progressView;
 
     // Shared preferences name;
     public static final String PREFS_NAME = "APP_PREF";
@@ -64,118 +48,61 @@ public class SignInActivity extends AppCompatActivity {
                 }
 
                 if (!error) {
-                    // Show a progress spinner, and kick off a background task to
-                    progressView = (CircularProgressView) findViewById(R.id.progress_view);
-                    progressView.setIndeterminate(true);
-                    progressView.startAnimation();
-
-                    // perform the add book attempt.
-                    mAuthTask = new SignIn(mUserName);
-                    mAuthTask.execute((Void) null);
+                    String url = "users/addUser/" + mUserName;
+                    HashMap<String, String> data = new HashMap<String, String>();
+                    AsyncTaskModuler moduler = new AsyncTaskModuler(SignInActivity.this, data, url, completeSignIn);
+                    moduler.execute();
                 }
             }
         });
     }
 
-    /**
-     * Represents an asynchronous sign in request
-     */
-    public class SignIn extends AsyncTask<Void, Void, Boolean> {
-
-        private User mUser;
-
-        private String serverMessage;
-
-        SignIn(String userName) {
-            mUser = new User(userName);
-        }
+    OnTaskCompleteListener completeSignIn = new OnTaskCompleteListener() {
 
         @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-            int success = 0;
-
+        public void onCompleteListener(String response) {
             try {
-                // Simulate network access.
-                String responseData = null;
-                String url = "http://zabalunga.herokuapp.com/users/addUser/" + mUserName;
-                try {
-                    Request request = new Request.Builder()
-                            .url(url)
-                            .build();
-
-                    try (Response response = client.newCall(request).execute()) {
-                        responseData = response.body().string();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                // convert response data to json object
-                JSONObject json = new JSONObject(responseData);
-
-                // check your log for json response
-                Log.v("LoginServerResponse", json.toString());
-
-                // json success tag
-                success = json.getInt("success");
-
-                if (success == 1) {
-                    JSONObject userData = json.getJSONObject("user");
-
-                    mUser.setId(userData.getString("_id"));
-                    mUser.setPrivateKey(userData.getString("private_key"));
-                }
-                serverMessage = json.getString("message");
-
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                // Interrupt Exception
-                return false;
+                addUserInfoToPref(response);
             } catch (JSONException e) {
-                // JSON Exception
                 e.printStackTrace();
             }
-
-            return (success == 1);
         }
+    };
 
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            if (success) {
-                // Stop progress spinner
-                progressView.setVisibility(View.GONE);
-                progressView.stopAnimation();
+    public void addUserInfoToPref(String response) throws JSONException {
+        // convert response data to json object
+        JSONObject serverResponse = new JSONObject(response);
 
-                SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        // check your log for json response
+        Log.v("SignInServerResponse", serverResponse.toString());
 
-                // Writing data to SharedPreferences
-                SharedPreferences.Editor editor = settings.edit();
-                editor.putString("user_id", mUser.getId());
-                editor.putString("user_name", mUser.getName());
-                editor.putString("user_private_key", mUser.getPrivateKey());
-                editor.putBoolean("logged_in", true);
+        // json success tag
+        int success = 0;
+        success = serverResponse.getInt("success");
 
-                // save data to shared preferences
-                editor.commit();
+        if (success == 1) {
+            JSONObject userData = serverResponse.getJSONObject("data");
 
-                // start main activity intent
-                Intent theIntent = new Intent(SignInActivity.this, MainActivity.class);
-                startActivity(theIntent);
-            } else {
-                Toast.makeText(SignInActivity.this, serverMessage,
-                        Toast.LENGTH_LONG).show();
-            }
-        }
+            SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
-        @Override
-        protected void onCancelled() {
-            // set null async task
-            mAuthTask = null;
+            // Writing data to SharedPreferences
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString("user_id", userData.getString("_id"));
+            editor.putString("user_name", userData.getString("username"));
+            editor.putString("user_private_key", userData.getString("private_key"));
+            editor.putBoolean("logged_in", true);
 
-            // Stop progress spinner
-            progressView.setVisibility(View.GONE);
-            progressView.stopAnimation();
+            // save data to shared preferences
+            editor.commit();
+
+            // start main activity intent
+            Intent theIntent = new Intent(SignInActivity.this, MainActivity.class);
+            startActivity(theIntent);
+        } else {
+            String serverMessage = serverResponse.getString("message");
+
+            Toast.makeText(SignInActivity.this, serverMessage,
+                    Toast.LENGTH_LONG).show();
         }
     }
 }

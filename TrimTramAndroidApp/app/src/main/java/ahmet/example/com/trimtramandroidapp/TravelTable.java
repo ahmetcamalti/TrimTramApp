@@ -1,7 +1,7 @@
 package ahmet.example.com.trimtramandroidapp;
 
 import android.app.Activity;
-import android.util.Log;
+import android.content.Intent;
 import android.view.View;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -12,20 +12,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Ahmet on 26-Mar-17.
  */
 public class TravelTable {
-    private TableLayout travelsTableLayout;
     private Activity theActivity;
 
     public TravelTable(Activity theActivity) {
         this.theActivity = theActivity;
-        travelsTableLayout = (TableLayout) this.theActivity.findViewById(R.id.table_travels);
     }
 
-    public void addTravelsToUI(String response) throws JSONException {
+    public void addTravelsToUI(String response, final String currentUserId) throws JSONException {
         ArrayList<Travel> travels = new ArrayList<Travel>();
 
         // create json array from json object
@@ -39,13 +38,16 @@ public class TravelTable {
             // get row as string from json array
             String theTravelDataString = travelsData.getString(i);
             // create travel object from json string
-            theTravel.createFromJSONString(theTravelDataString);
+            theTravel.createFromJSONString(theTravelDataString, currentUserId);
             // add travel object to travels list
             travels.add(theTravel);
         }
 
+        TableLayout travelsTableLayout = (TableLayout) this.theActivity.findViewById(R.id.table_travels);
+        travelsTableLayout.removeAllViews();
+
         for (int i = 0; i < travels.size(); i++) {
-            Travel theTravel = travels.get(i);
+            final Travel theTravel = travels.get(i);
 
             TableRow travelRow = (TableRow) View.inflate(this.theActivity, R.layout.tablerow_travel, null);
             TableLayout.LayoutParams lp =
@@ -58,13 +60,56 @@ public class TravelTable {
             TextView travelTitleTextView = (TextView) travelRow.findViewById(R.id.textview_travel_title);
             TextView travelTimeTextView = (TextView) travelRow.findViewById(R.id.textview_time);
             TextView travelPlacesTextView = (TextView) travelRow.findViewById(R.id.textview_places);
+            TextView travelActionTextView = (TextView) travelRow.findViewById(R.id.textview_action);
 
             travelTitleTextView.setText(theTravel.getTitle());
             travelTimeTextView.setText(Integer.toString(theTravel.getTime()));
             travelPlacesTextView.setText(theTravel.getPlace().getTitle());
+            travelActionTextView.setText("JOIN");
+
+            if (theTravel.getCurrentUserIsJoined() == false) {
+                travelActionTextView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        addUserToTravel(theTravel.getId(), currentUserId);
+                    }
+                });
+            } else {
+
+            }
 
             // add row to table layout
             travelsTableLayout.addView(travelRow, lp);
         }
+    }
+
+    public void addUserToTravel(String travelId, String currentUserId) {
+        String url = "travels/add/" + travelId + "/" + currentUserId;
+        HashMap<String, String> data = new HashMap<String, String>();
+        AsyncTaskModuler moduler = new AsyncTaskModuler(this.theActivity, data, url, completeAddUserToTravel);
+        moduler.execute();
+    }
+
+    OnTaskCompleteListener completeAddUserToTravel = new OnTaskCompleteListener() {
+
+        @Override
+        public void onCompleteListener(String response) {
+            try {
+                openTravelDetail(response);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+    public void openTravelDetail(String response) throws JSONException {
+        JSONObject responseData = new JSONObject(response);
+        JSONObject travelData = responseData.getJSONObject("data");
+
+        String travelId = travelData.getString("_id");
+
+        Intent intent = new Intent(this.theActivity, TravelDetailActivity.class);
+        intent.putExtra("TRAVEL_ID", travelId);
+        theActivity.startActivity(intent);
     }
 }

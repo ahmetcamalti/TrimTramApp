@@ -11,4 +11,8 @@
     <string name="spinner_time">Time</string>
     <string name="spinner_place">Place</string>
     <string name="btn_travel_search">Find</string>
+    <string name="title_activity_my_travels">MyTravelsActivity</string>
+
+
+    <string name="table_row_action">JOIN</string>
 </resources>

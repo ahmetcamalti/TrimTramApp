@@ -11,4 +11,7 @@
     <string name="spinner_time">Zaman</string>
     <string name="spinner_place">Yer</string>
     <string name="btn_travel_search">Bul</string>
+
+
+    <string name="table_row_action">KATIL</string>
 </resources>

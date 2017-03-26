@@ -13,8 +13,15 @@ import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
+    private AsyncTaskModuler moduler;
+
+    private FloatingActionButton fab;
+    private FloatingActionButton myTravelsButton;
+
     // Shared preferences name;
     public static final String PREFS_NAME = "APP_PREF";
+
+    private String currentUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,14 +37,35 @@ public class MainActivity extends AppCompatActivity {
             startActivity(theIntent);
         }
 
+        // get user id from shared preferences
+        currentUserId = session.getString("user_id", null);
+
         // init floating action button
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setVisibility(View.GONE);
         // set onclick listener to fab button
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                moduler.cancel(true);
+
                 // Click action
                 Intent intent = new Intent(MainActivity.this, EventFinderActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        // init floating action button
+        myTravelsButton = (FloatingActionButton) findViewById(R.id.myTravels);
+        myTravelsButton.setVisibility(View.GONE);
+        // set onclick listener to fab button
+        myTravelsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                moduler.cancel(true);
+
+                // Click action
+                Intent intent = new Intent(MainActivity.this, MyTravelsActivity.class);
                 startActivity(intent);
             }
         });
@@ -53,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
     public void getAllTravels() {
         String url = "travels/all";
         HashMap<String, String> data = new HashMap<String, String>();
-        AsyncTaskModuler moduler = new AsyncTaskModuler(MainActivity.this, data, url, completeGetAllTravels);
+        moduler = new AsyncTaskModuler(MainActivity.this, data, url, completeGetAllTravels);
         moduler.execute();
     }
 
@@ -61,11 +89,14 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onCompleteListener(String response) {
+            fab.setVisibility(View.VISIBLE);
+            myTravelsButton.setVisibility(View.VISIBLE);
+
             try {
                 TravelTable travelTable = new TravelTable(MainActivity.this);
 
                 // add travel data to UI
-                travelTable.addTravelsToUI(response);
+                travelTable.addTravelsToUI(response, currentUserId);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

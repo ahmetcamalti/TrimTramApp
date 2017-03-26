@@ -1,5 +1,6 @@
 package ahmet.example.com.trimtramandroidapp;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -32,10 +33,19 @@ public class EventFinderActivity extends AppCompatActivity implements MultiSelec
     private LinearLayout travelSearchLayout;
     private TableLayout travelTableLayout;
 
+    // Shared preferences name;
+    public static final String PREFS_NAME = "APP_PREF";
+
+    private String currentUserId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_finder);
+
+        SharedPreferences session = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        // get user id from shared preferences
+        currentUserId = session.getString("user_id", null);
 
         travelSearchLayout = (LinearLayout) findViewById(R.id.travel_search_layout);
 
@@ -154,7 +164,7 @@ public class EventFinderActivity extends AppCompatActivity implements MultiSelec
                 TravelTable travelTable = new TravelTable(EventFinderActivity.this);
 
                 // add travel data to UI
-                travelTable.addTravelsToUI(response);
+                travelTable.addTravelsToUI(response, currentUserId);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
