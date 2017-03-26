@@ -74,18 +74,18 @@ router.get('/clear', function(req, res, next) {
 });
 
 // get my travels
-router.get('/myTravels/:u_name/:p_key', function(req, res, next){
+router.get('/myTravels/:u_id/:p_key', function(req, res, next){
 
-  var username = req.params.u_name;
+  var id = req.params.u_id;
   var private_key = req.params.p_key;
 
-  User.findOne({username: username, private_key:private_key}).populate('travels').exec()
+  User.findOne({_id: id, private_key:private_key}).populate('travels').exec()
   .then(function(user){
     response = helpers.respond(1, "get my travels", user.travels);
   })
   .then(undefined, function(err){
     //Handle error
-    response = helpers.respond(0, 'error in myTravels/:u_name:/:p_key');
+    response = helpers.respond(0, 'error in myTravels/:u_id:/:p_key');
     console.log(response);
   });
   res.json(response);
@@ -95,7 +95,7 @@ router.get('/myTravels/:u_name/:p_key', function(req, res, next){
 router.get('/dummy', function(req, res, next){
 
   for (var i = 0; i < 10; i++){
-    
+
     Travel.findRandom({},{},{limit:3},function(err, results){
       if (err) {
         response = helpers.respond(0,'travel find random error');
@@ -139,7 +139,7 @@ router.get('/similarity/:user_id', function(req, res, next){
       response = helpers.respond(0, 'similarity find error');
       console.log(response);
     }else{
-      
+
       var hash = [];
       for (var i = 0; i < results.travels.length; i++){
         hash[results.travels[i]] = 1;
@@ -158,18 +158,18 @@ router.get('/similarity/:user_id', function(req, res, next){
                 sims[i] += 1;
               }
             }
-            sims[i] = {sim:sims[i], user: results2[i].username}; 
-          } 
+            sims[i] = {sim:sims[i], user: results2[i].username};
+          }
           sims.sort(function(a, b) {
               return parseFloat(b.sim) - parseFloat(a.sim);
           });
-          response = helpers.respond(1,'get similarity success', sims); 
+          response = helpers.respond(1,'get similarity success', sims);
           console.log(sims);
         }
         res.json(response);
       });
     }
-    
+
   });
 });
 

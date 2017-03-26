@@ -2,16 +2,12 @@ package ahmet.example.com.trimtramandroidapp;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.guna.libmultispinner.MultiSelectionSpinner;
 
 import org.json.JSONArray;
@@ -36,9 +32,6 @@ public class EventFinderActivity extends AppCompatActivity implements MultiSelec
     private LinearLayout travelSearchLayout;
     private TableLayout travelTableLayout;
 
-    // CircularProgressView Library
-    private CircularProgressView progressView;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,8 +51,6 @@ public class EventFinderActivity extends AppCompatActivity implements MultiSelec
         multiSelectionTimeSpinner.setItems(array);
         multiSelectionTimeSpinner.setListener(this);
 
-        getPlaceSpinnerData();
-
         Button travelSearchButton = (Button) findViewById(R.id.button_travel_search);
         travelSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,6 +69,9 @@ public class EventFinderActivity extends AppCompatActivity implements MultiSelec
                 findTravelByFilter(timesDataForFilter, placesDataForFilter);
             }
         });
+
+        // get all place data for spinner
+        getPlaceSpinnerData();
     }
 
     @Override
@@ -93,21 +87,12 @@ public class EventFinderActivity extends AppCompatActivity implements MultiSelec
         HashMap<String, String> data = new HashMap<String, String>();
         AsyncTaskModuler moduler = new AsyncTaskModuler(EventFinderActivity.this, data, url, completeGetPlaces);
         moduler.execute();
-
-        // Show a progress spinner, and kick off a background task to
-        progressView = (CircularProgressView) findViewById(R.id.progress_view);
-        progressView.setIndeterminate(true);
-        progressView.startAnimation();
     }
 
     OnTaskCompleteListener completeGetPlaces = new OnTaskCompleteListener() {
 
         @Override
         public void onCompleteListener(String response) {
-            // Stop progress spinner
-            progressView.setVisibility(View.GONE);
-            progressView.stopAnimation();
-
             travelSearchLayout.setVisibility(View.VISIBLE);
 
             try {
@@ -157,78 +142,22 @@ public class EventFinderActivity extends AppCompatActivity implements MultiSelec
         moduler.execute();
 
         travelSearchLayout.setVisibility(View.GONE);
-
-        // Show a progress spinner, and kick off a background task to
-        progressView = (CircularProgressView) findViewById(R.id.progress_view);
-        progressView.setIndeterminate(true);
-        progressView.setVisibility(View.VISIBLE);
-        progressView.startAnimation();
     }
 
     OnTaskCompleteListener completeTravelByFilter = new OnTaskCompleteListener() {
 
         @Override
         public void onCompleteListener(String response) {
-            // Stop progress spinner
-            progressView.setVisibility(View.GONE);
-            progressView.stopAnimation();
-
             travelTableLayout.setVisibility(View.VISIBLE);
 
             try {
-                addTravelsToUI(response);
+                TravelTable travelTable = new TravelTable(EventFinderActivity.this);
+
+                // add travel data to UI
+                travelTable.addTravelsToUI(response);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
     };
-
-    public void addTravelsToUI(String response) throws JSONException {
-        ArrayList<Travel> travels = new ArrayList<Travel>();
-
-        // create json array from json object
-        JSONObject json = new JSONObject(response);
-        JSONArray travelsData = json.getJSONArray("data");
-
-        Log.e("travelsData", travelsData.toString());
-
-        // travel all array rows
-        for (int i = 0; i < travelsData.length(); i++) {
-            Travel theTravel = new Travel();
-
-            // get row as string from json array
-            String theTravelDataString = travelsData.getString(i);
-            // create travel object from json string
-            theTravel.createFromJSONString(theTravelDataString);
-            // add travel object to travels list
-            travels.add(theTravel);
-        }
-
-        Log.e("Travels", travels.toString());
-
-        TableLayout travelsTableLayout = (TableLayout) findViewById(R.id.table_travels);
-
-        for (int i = 0; i < travels.size(); i++) {
-            Travel theTravel = travels.get(i);
-
-            TableRow travelRow = (TableRow) View.inflate(EventFinderActivity.this, R.layout.tablerow_travel, null);
-            TableLayout.LayoutParams lp =
-                    new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,
-                            TableLayout.LayoutParams.WRAP_CONTENT);
-
-            lp.setMargins(0, 25, 0, 0);
-            travelRow.setLayoutParams(lp);
-
-            TextView travelTitleTextView = (TextView) travelRow.findViewById(R.id.textview_travel_title);
-            TextView travelTimeTextView = (TextView) travelRow.findViewById(R.id.textview_time);
-            TextView travelPlacesTextView = (TextView) travelRow.findViewById(R.id.textview_places);
-
-            travelTitleTextView.setText(theTravel.getTitle());
-            travelTimeTextView.setText(Integer.toString(theTravel.getTime()));
-            travelPlacesTextView.setText(theTravel.getPlace().getTitle());
-
-            // add row to table layout
-            travelsTableLayout.addView(travelRow, lp);
-        }
-    }
 }
