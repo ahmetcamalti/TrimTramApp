@@ -1,9 +1,11 @@
 var express = require('express');
 var rand = require("random-key");
 var random_name = require('node-random-name');
+var gp = require('googleplaces');
+
 var router = express.Router();
 var helpers = require('../helpers');
-
+var config = require('../config');
 var User = require('../models/user');
 var Travel = require('../models/travel');
 
@@ -126,6 +128,49 @@ router.get('/dummy', function(req, res, next){
     });
   }
   res.json(response);
+});
+
+router.get('/similarity/:user_id', function(req, res, next){
+  var user_id = req.params.user_id;
+  User.findById(user_id, function(err, results){
+    var response;
+
+    if (err){
+      response = helpers.respond(0, 'similarity find error');
+      console.log(response);
+    }else{
+      
+      var hash = [];
+      for (var i = 0; i < results.travels.length; i++){
+        hash[results.travels[i]] = 1;
+      }
+
+      User.find({_id:{$ne:user_id}}, function(err2, results2){
+        if (err2) {
+          response = helpers.respond(0, 'similarity find error');
+          console.log(response);
+        }else{
+          var sims = [];
+          for (var i = 0; i < results2.length; i++){
+            sims[i] = 0;
+            for (var j = 0; j < results2[i].travels.length; j++){
+              if (results2[i].travels[j] in hash){
+                sims[i] += 1;
+              }
+            }
+            sims[i] = {sim:sims[i], user: results2[i].username}; 
+          } 
+          sims.sort(function(a, b) {
+              return parseFloat(b.sim) - parseFloat(a.sim);
+          });
+          response = helpers.respond(1,'get similarity success', sims); 
+          console.log(sims);
+        }
+        res.json(response);
+      });
+    }
+    
+  });
 });
 
 module.exports = router;

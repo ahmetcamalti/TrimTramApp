@@ -1,8 +1,12 @@
 var express = require('express');
 var router = express.Router();
 var Promise = require('bluebird');
+var gp = require('googleplaces');
+
+
 var helpers = require('../helpers');
 var Place = require('../models/place');
+var config = require('../config');
 
 // promisify the entire mongoose Model
 Place = Promise.promisifyAll(Place)
@@ -26,10 +30,29 @@ router.get('/all', function(req, res, next) {
 // async dummy data generation
 router.get('/dummy', function(req, res, next){
 
-	var cnt = 0;
-	var places = [1,2,3,4,5,6,7,8,9,10];
+	var goo = gp(config.googlePlaceKey, config.googlePlaceFormat);
+  goo.nearBySearch({location: "41.0780754,29.0227915", radius:1000}, function(err, data){
+    if (err){
+      console.log(err);
+    }else{
+    		var results = data.results;
+		    for (var i = 0; i < results.length; i++){
+		    	var title = results[i].name;
+		    	var lat = parseFloat(results[i].geometry.location.lat);
+		    	var lon = parseFloat(results[i].geometry.location.lng);
+		    	var newPlace = Place({title: title, lat:lat, lon:lon});
+					newPlace.save(function(err, place){
+						if (err) throw err;
+						if (i == 9){
+							console.log('added 10 places');
+						}
+					});
+		    }
+    }
+    res.json(results);
+  });
 
-	var loaded = new Promise(function(resolve, reject){
+	/*var loaded = new Promise(function(resolve, reject){
 		Promise.each(places, function(p){
 			var title = "place " + p;
 			var lat = p * p + p; 		// just a random number
@@ -57,21 +80,7 @@ router.get('/dummy', function(req, res, next){
     }
   });
 
-  res.json(response);
-
- 	/*for (var i = 0; i < 10; i++){
- 		var title = "place " + i;
- 		var lat = i* i + i + "";
-		var long = 2*i*i + 1 + "";
-		var newPlace = Place({title: title, lat:lat, long:long});
-		newPlace.save(function(err, place){
-			if (err) throw err;
-			if (i == 9){
-				console.log('added 10 places');
-			}
-		});
- 	}*/
- 	//res.json('adding 10 places');
+  res.json(response);*/
 
 });
 

@@ -12,6 +12,7 @@
     "debug": "~2.6.0",
     "echarts": "^3.4.0",
     "express": "~4.14.1",
+    "googleplaces": "^0.6.1",
     "jsonwebtoken": "^7.3.0",
     "mongoose": "^4.8.1",
     "mongoose-simple-random": "^0.4.1",
