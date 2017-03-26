@@ -242,7 +242,7 @@ router.get('/inrange/:lon/:lat/:radius', function(req, res, next){
   var lat = parseFloat(req.params.lat);
   var radius = parseFloat(req.params.radius);
 
-  console.log(lon +' ' + lat + ' ' + radius);
+  console.log(lon +'-' + lat + '-' + radius);
 
   Travel.find({}).populate('place').exec(function(err,travels){
 
@@ -252,7 +252,9 @@ router.get('/inrange/:lon/:lat/:radius', function(req, res, next){
       var closeTravels = [];
       for (var i = 0; i < travels.length; i++){
         var p = travels[i].place;
+
         if (p){
+          console.log(p.lon + ' - ' + p.lat + ' - ' + radius);
           if ( (p.lon-lon)*(p.lon-lon) + (p.lat-lat)*(p.lat-lat) < radius*radius ){
             closeTravels.push(travels[i]);
           }  
