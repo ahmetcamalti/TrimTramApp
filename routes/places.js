@@ -33,7 +33,8 @@ router.get('/dummy', function(req, res, next){
 	var goo = gp(config.googlePlaceKey, config.googlePlaceFormat);
   goo.nearBySearch({location: "41.0780754,29.0227915", radius:1000}, function(err, data){
     if (err){
-      console.log(err);
+    	response = helpers.respond(0, "googleplaces api error");
+      console.log(response);
     }else{
     		var results = data.results;
 		    for (var i = 0; i < results.length; i++){
@@ -48,8 +49,13 @@ router.get('/dummy', function(req, res, next){
 						}
 					});
 		    }
+		    if (results.length == 0){
+					response = helpers.respond(2,"no close place exist", results);
+		    }else{
+		    	response = helpers.respond(1,"success to fetch close places", results);
+		    }
     }
-    res.json(results);
+    res.json(response);
   });
 
 	/*var loaded = new Promise(function(resolve, reject){
@@ -120,6 +126,28 @@ router.get('/searchByName/:title', function(req, res, next){
 
 		res.json(response);
 	});
+});
+
+router.get('/closePlaces/:lon/:lat/:radius', function(req, res, next){
+	var lon = "" + (req.params.lon);
+  var lat = "" + (req.params.lat);
+  var radius = parseFloat(req.params.radius);
+
+  var goo = gp(config.googlePlaceKey, config.googlePlaceFormat);
+  goo.nearBySearch({location: lat+","+lon, radius:radius}, function(err, data){
+    if (err){
+      response = helpers.respond(0, "googleplaces api error");
+      console.log(response);
+    }else{
+  		var results = data.results;
+  		if (results.length == 0){
+				response = helpers.respond(2,"no close place exist", results);
+	    }else{
+	    	response = helpers.respond(1,"success to fetch close places", results);
+	    }
+		}
+    res.json(response);
+  });
 });
 
 module.exports = router;
