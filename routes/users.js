@@ -2,12 +2,15 @@ var express = require('express');
 var rand = require("random-key");
 var random_name = require('node-random-name');
 var gp = require('googleplaces');
+var Promise = require('bluebird');
 
 var router = express.Router();
 var helpers = require('../helpers');
 var config = require('../config');
 var User = require('../models/user');
 var Travel = require('../models/travel');
+
+Travel = Promise.promisifyAll(Travel);
 
 const crypto = require('crypto');
 
@@ -112,7 +115,17 @@ router.get('/dummy', function(req, res, next){
             console.log("added 10 users");
             response = helpers.respond(1,"added 10 users", []);
           }
-          for ( var j = 0; j < results.length; j++){
+
+          Promise.map(results, function(r){
+            r.users.push(u._id);
+            r.going_cnt++;
+
+            return r.save()
+            .then(function(r2){
+              response = helpers.respond(1,"saved travel", []);
+            })
+          });
+          /*for ( var j = 0; j < results.length; j++){
             var r = results[j];
             r.users.push(u._id);
             r.going_cnt = r.going_cnt + 1;
@@ -121,7 +134,7 @@ router.get('/dummy', function(req, res, next){
                 response = helpers.respond(0,'travel find random error');
               }
             });
-          }
+          }*/
         });
       }
 

@@ -3,13 +3,12 @@ var router = express.Router();
 var Promise = require('bluebird');
 var gp = require('googleplaces');
 
-
 var helpers = require('../helpers');
 var Place = require('../models/place');
 var config = require('../config');
 
 // promisify the entire mongoose Model
-Place = Promise.promisifyAll(Place)
+// Place = Promise.promisifyAll(Place);
 
 /* GET place listing. */
 router.get('/all', function(req, res, next) {
@@ -87,7 +86,6 @@ router.get('/dummy', function(req, res, next){
   });
 
   res.json(response);*/
-
 });
 
 // delete all the places

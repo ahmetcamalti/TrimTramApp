@@ -160,7 +160,8 @@ router.get('/add/:travel_id/:uid', function(req, res, next){
         }else{
           User.findById(user_id).exec(function(err, result){
             if (err){
-              response = helpers.respond(0, 'finding user error', tr);  
+              response = helpers.respond(0, 'finding user error', tr);
+              res.json(response);  
             }else{
               result.travels.push(travel_id);
               result.save(function(err, use){
@@ -171,9 +172,9 @@ router.get('/add/:travel_id/:uid', function(req, res, next){
                   response = helpers.respond(1, 'added user to travel', use);
                   console.log(response);
                 }
+                res.json(response);
               });
             }
-            res.json(response);
           });
         }
       });
@@ -182,7 +183,6 @@ router.get('/add/:travel_id/:uid', function(req, res, next){
       console.log(response);
       res.json(response);
     }
-    
   });
 });
 
@@ -216,6 +216,7 @@ router.get('/remove/:travel_id/:uid', function(req, res, next){
             if(err){
               response = respond(0, err);
               console.log(response);
+              res.json(response);
             }else{
               us.travels.pull(travel_id);
               us.save(function(err, use){
@@ -223,11 +224,11 @@ router.get('/remove/:travel_id/:uid', function(req, res, next){
                   response = helpers.respond(0, err);
                   console.log(response);
                 }else{
-                  response = helpers.respond(1, 'added user to travel', use);
+                  response = helpers.respond(1, 'removed user from travel', use);
                 }
+                res.json(response);
               });
             }
-            res.json(response);
           });
         }
       });
