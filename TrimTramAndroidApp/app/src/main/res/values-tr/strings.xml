@@ -6,4 +6,9 @@
     <string name="prompt_username">Kullanıcı Adı</string>
     <string name="btn_sign_In">Giriş</string>
     <string name="error_field_required">Bu alan zorunludur!</string>
+
+    <!-- Event Finder Activity String -->
+    <string name="spinner_time">Zaman</string>
+    <string name="spinner_place">Yer</string>
+    <string name="btn_travel_search">Bul</string>
 </resources>

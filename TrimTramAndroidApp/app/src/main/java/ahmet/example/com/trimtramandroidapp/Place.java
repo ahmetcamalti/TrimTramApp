@@ -7,6 +7,7 @@ import org.json.JSONObject;
  * Created by Ahmet on 25-Mar-17.
  */
 public class Place {
+    private String id;
     private String title;
     private String lat;
     private String lon;
@@ -17,6 +18,21 @@ public class Place {
         this.title = title;
         this.lat = lat;
         this.lon = lon;
+    }
+
+    public Place(String id, String title, String lat, String lon) {
+        this.id = id;
+        this.title = title;
+        this.lat = lat;
+        this.lon = lon;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -47,6 +63,8 @@ public class Place {
         // convert place string data to json object
         JSONObject placeJSON = new JSONObject(jsonData);
 
+        // set id of place object
+        this.setId(placeJSON.getString("_id"));
         // set title of place object
         this.setTitle(placeJSON.getString("title"));
         // set lat of place object
