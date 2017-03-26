@@ -26,6 +26,24 @@ router.get('/all', function(req, res, next) {
   });
 });
 
+/* GET place by its ID. */
+router.get('/byId/:id', function(req, res, next) {
+	var id = req.params.id;
+
+  // get all the places
+  Place.findById(id, function(err, result) {
+    if (err){
+    	response = helpers.respond(0, err);
+    	console.log(response);
+    }else{
+    	response = helpers.respond(1, "all places", result);
+    }
+
+    // save the result into the response object.
+    res.json(response);
+  });
+});
+
 // async dummy data generation
 router.get('/dummy', function(req, res, next){
 

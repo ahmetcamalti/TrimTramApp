@@ -61,6 +61,22 @@ router.get('/addUser/:username', function(req, res, next) {
   }
 });
 
+/* get user by its Id*/
+router.get('/byId/:id', function(req, res, next) {
+  var id = req.params.id;
+
+  User.findById(id, function(err, us){
+    if (err){
+      response = helpers.respond(0, err);
+      console.log(response);
+    }else{
+      response = helpers.respond(1, 'get user by its Id', us);
+    }
+
+    res.json(response);
+  });
+});
+
 /* remove all users */
 router.get('/clear', function(req, res, next) {
   // get all the users

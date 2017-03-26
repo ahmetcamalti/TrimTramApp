@@ -55,7 +55,7 @@ router.get('/addTravel/:travelData', function(req, res, next) {
 });
 
 /* get travel by title */
-router.get('/getTravelByTitle/:title', function(req, res, next) {
+router.get('/byTitle/:title', function(req, res, next) {
   // create json objset from string
   var query = req.params.title;
   
@@ -72,7 +72,7 @@ router.get('/getTravelByTitle/:title', function(req, res, next) {
 });
 
 /* get travel by its place name */
-router.get('/getTravelByPlace/:title', function(req, res, next) {
+router.get('/byPlace/:title', function(req, res, next) {
   // create json objset from string
   var query = req.params.title;
   
@@ -95,6 +95,22 @@ router.get('/getTravelByPlace/:title', function(req, res, next) {
   })
 
   res.json(response);
+});
+
+/* get travel by its ID */
+router.get('/byId/:id', function(req, res, next) {
+  // create json objset from string
+  var id = req.params.id;
+  
+  // get all the travels filtering by places
+  Travel.findById(id, function(err, result){
+    if (err){
+      response = helpers.respond(0, err);
+    }else{
+      response = helpers.respond(1, "got the travel by its ID", result);
+    }
+    res.json(response);
+  });
 });
 
 /* remove all travels */
