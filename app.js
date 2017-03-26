@@ -17,11 +17,11 @@ var config = require('./config');
 mongoose.connect(config.mongoUrl);
 mongoose.Promise = require('bluebird');
 
-var client = redis.createClient();
+/*var client = redis.createClient();
 
 client.on('connect', function() {
     console.log('redis connected');
-});
+});*/
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
