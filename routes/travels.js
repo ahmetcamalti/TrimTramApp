@@ -142,8 +142,9 @@ router.get('/candidates/:specs', function(req, res, next){
 // subscribe a user to a travel
 router.get('/add/:travel_id/:uid', function(req, res, next){
   var user_id = req.params.uid;
+  var travel_id = req.params.travel_id;
   var response;
-  Travel.findById(req.params.travel_id).exec(function(err0, travel){
+  Travel.findById(travel_id).exec(function(err0, travel){
     if (err0){
       response = helpers.respond(0, err0);
       console.log(response);
