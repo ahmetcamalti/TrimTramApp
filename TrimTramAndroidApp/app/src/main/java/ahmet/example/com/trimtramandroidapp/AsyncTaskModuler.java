@@ -1,8 +1,11 @@
 package ahmet.example.com.trimtramandroidapp;
 
-import android.content.Context;
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
+
+import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -16,7 +19,7 @@ import okhttp3.Response;
  */
 public class AsyncTaskModuler  extends AsyncTask<Void, Void, String> {
 
-    private Context context;
+    private Activity theActivity;
     private HashMap<String, String> data;
     private String URL;
     private OnTaskCompleteListener taskdone;
@@ -25,13 +28,22 @@ public class AsyncTaskModuler  extends AsyncTask<Void, Void, String> {
     // OkHttpClient Library
     private OkHttpClient client = new OkHttpClient();
 
-    public AsyncTaskModuler(Context ctx, HashMap<String, String> data, String url, OnTaskCompleteListener taskdone) {
+    // CircularProgressView Library
+    private CircularProgressView progressView;
 
-        this.context = ctx;
+    public AsyncTaskModuler(Activity theActivity, HashMap<String, String> data, String url, OnTaskCompleteListener taskdone) {
+        this.theActivity = theActivity;
         this.data = data;
         this.URL = url;
         this.taskdone = taskdone;
         this.baseURL = "http://zabalunga.herokuapp.com/";
+
+
+        // Show a progress spinner, and kick off a background task to
+        progressView = (CircularProgressView) theActivity.findViewById(R.id.progress_view);
+        progressView.setVisibility(View.VISIBLE);
+        progressView.setIndeterminate(true);
+        progressView.startAnimation();
     }
 
     @Override
@@ -69,6 +81,10 @@ public class AsyncTaskModuler  extends AsyncTask<Void, Void, String> {
 
     @Override
     protected void onPostExecute(String result) {
+        // Stop progress spinner
+        progressView.setVisibility(View.GONE);
+        progressView.stopAnimation();
+
         taskdone.onCompleteListener(result);
     }
 }
