@@ -148,6 +148,7 @@ router.get('/add/:travel_id/:uid', function(req, res, next){
     if (err0){
       response = helpers.respond(0, err0);
       console.log(response);
+      res.json(response);
     }else if (travel.users.indexOf(user_id) == -1){
       travel.users.push(user_id);
       travel.going_cnt = travel.going_cnt + 1;
@@ -155,6 +156,7 @@ router.get('/add/:travel_id/:uid', function(req, res, next){
         if (err){
           response = helpers.respond(0, err);
           console.log(response);
+          res.json(response);
         }else{
           User.findById(user_id).exec(function(err, result){
             if (err){
@@ -171,14 +173,16 @@ router.get('/add/:travel_id/:uid', function(req, res, next){
                 }
               });
             }
+            res.json(response);
           });
         }
       });
     }else{
       response = helpers.respond(0, 'user already going to event');
       console.log(response);
+      res.json(response);
     }
-    res.json(response);
+    
   });
 });
 
