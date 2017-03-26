@@ -122,12 +122,17 @@ router.get('/candidates/:specs', function(req, res, next){
     places[i] = mongoose.Types.ObjectId(data.places[i]);
   }
 
-  Travel.find({time: {$in: times}, place: {$in:places}}, function(err, result){
+  Travel.find({time: {$in: times}, place: {$in:places}})
+  .populate('place').populate('users').exec(function(err, result){
     if(err){
       response = helpers.respond(0, err);
       console.log(response);
     }else{
-      response = helpers.respond(0, err, result);
+      if (result.length == 0){
+        response = helpers.respond(2, "success", result);
+      }else{
+        response = helpers.respond(1, "success", result);
+      }
     }
     res.json(response);
   });
@@ -236,6 +241,9 @@ router.get('/inrange/:lon/:lat/:radius', function(req, res, next){
   var lon = parseFloat(req.params.lon);
   var lat = parseFloat(req.params.lat);
   var radius = parseFloat(req.params.radius);
+
+  console.log(lon +' ' + lat + ' ' + radius);
+
   Travel.find({}).populate('place').exec(function(err,travels){
 
     if (err){
