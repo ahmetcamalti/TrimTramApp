@@ -57,8 +57,12 @@ public class EventFinderActivity extends AppCompatActivity implements MultiSelec
 
         String[] array = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
                 "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"};
+
+        // multi selection spinner for times data
         multiSelectionTimeSpinner = (MultiSelectionSpinner) findViewById(R.id.timeSpinner);
+        // set spinner data
         multiSelectionTimeSpinner.setItems(array);
+        // set spinner listener
         multiSelectionTimeSpinner.setListener(this);
 
         Button travelSearchButton = (Button) findViewById(R.id.button_travel_search);
@@ -84,14 +88,6 @@ public class EventFinderActivity extends AppCompatActivity implements MultiSelec
         getPlaceSpinnerData();
     }
 
-    @Override
-    public void selectedIndices(List<Integer> indices) {
-    }
-
-    @Override
-    public void selectedStrings(List<String> strings) {
-    }
-
     public void getPlaceSpinnerData() {
         String url = "places/all";
         HashMap<String, String> data = new HashMap<String, String>();
@@ -106,6 +102,7 @@ public class EventFinderActivity extends AppCompatActivity implements MultiSelec
             travelSearchLayout.setVisibility(View.VISIBLE);
 
             try {
+                // call create places spinner method
                 createPlacesSpinner(response);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -114,32 +111,47 @@ public class EventFinderActivity extends AppCompatActivity implements MultiSelec
     };
 
     public void createPlacesSpinner(String response) throws JSONException {
+        // convert server response to json object
         JSONObject serverResponse = new JSONObject(response);
 
+        // get server response success
         if (serverResponse.getInt("success") == 1) {
+            // convert places data to json array
             JSONArray placesData = serverResponse.getJSONArray("data");
 
+            // create Place object from raw data
             for (int i = 0; i < placesData.length(); i++) {
+                // get row
                 String placeDataString = placesData.getString(i);
+
                 Place thePlace = new Place();
+                // set place data from string
                 thePlace.createFromJSONString(placeDataString);
 
+                // add place to Place ArrayList for user selection
                 places.add(i, thePlace);
+                // add place title for place multi selection spinner
                 placeTitles.add(thePlace.getTitle());
             }
 
+            // multi selection spinner for places data
             multiSelectionPlaceSpinner = (MultiSelectionSpinner) findViewById(R.id.placeSpinner);
+            // set spinner data
             multiSelectionPlaceSpinner.setItems(placeTitles);
+            // set spinner listener
             multiSelectionPlaceSpinner.setListener(this);
         } else {
+            // get server message
             String serverMessage = serverResponse.getString("message");
 
+            // give feedback to user
             Toast.makeText(EventFinderActivity.this, serverMessage,
                     Toast.LENGTH_LONG).show();
         }
     }
 
     public void findTravelByFilter(List<String> timesDataForFilter, ArrayList<String> placesDataForFilter) {
+        // create url with data
         String url = "travels/candidates/{\"times\":" + timesDataForFilter.toString() + ",\"places\":[";
         for (int i = 0; i < placesDataForFilter.size(); i++) {
             if (i > 0) url += ", ";
@@ -147,10 +159,11 @@ public class EventFinderActivity extends AppCompatActivity implements MultiSelec
         }
         url += "]}";
 
-        HashMap<String, String> data = new HashMap<String, String>();
-        AsyncTaskModuler moduler = new AsyncTaskModuler(EventFinderActivity.this, data, url, completeTravelByFilter);
+        // call async task for server request
+        AsyncTaskModuler moduler = new AsyncTaskModuler(EventFinderActivity.this, null, url, completeTravelByFilter);
         moduler.execute();
 
+        // visibility gone filter form layout
         travelSearchLayout.setVisibility(View.GONE);
     }
 
@@ -158,9 +171,11 @@ public class EventFinderActivity extends AppCompatActivity implements MultiSelec
 
         @Override
         public void onCompleteListener(String response) {
+            // visibility visible travel table
             travelTableLayout.setVisibility(View.VISIBLE);
 
             try {
+                // travel table module
                 TravelTable travelTable = new TravelTable(EventFinderActivity.this);
 
                 // add travel data to UI
@@ -170,4 +185,12 @@ public class EventFinderActivity extends AppCompatActivity implements MultiSelec
             }
         }
     };
+
+    @Override
+    public void selectedIndices(List<Integer> indices) {
+    }
+
+    @Override
+    public void selectedStrings(List<String> strings) {
+    }
 }

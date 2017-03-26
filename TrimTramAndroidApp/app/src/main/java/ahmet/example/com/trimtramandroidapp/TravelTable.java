@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,8 +29,20 @@ public class TravelTable {
         ArrayList<Travel> travels = new ArrayList<Travel>();
 
         // create json array from json object
-        JSONObject json = new JSONObject(response);
-        JSONArray travelsData = json.getJSONArray("data");
+        JSONObject serverResponse = new JSONObject(response);
+
+        // get response success
+        if (serverResponse.getInt("success") == 0) {
+            // if there is an error on server, return
+            String serverMessage = serverResponse.getString("message");
+
+            Toast.makeText(this.theActivity, serverMessage,
+                    Toast.LENGTH_LONG).show();
+
+            return;
+        }
+
+        JSONArray travelsData = serverResponse.getJSONArray("data");
 
         // travel all array rows
         for (int i = 0; i < travelsData.length(); i++) {
@@ -103,13 +116,26 @@ public class TravelTable {
     };
 
     public void openTravelDetail(String response) throws JSONException {
-        JSONObject responseData = new JSONObject(response);
-        JSONObject travelData = responseData.getJSONObject("data");
+        // response convert to json object
+        JSONObject serverResponse = new JSONObject(response);
 
-        String travelId = travelData.getString("_id");
+        // get response success
+        if (serverResponse.getInt("success") == 1) {
+            // get travel data
+            JSONObject travelData = serverResponse.getJSONObject("data");
+            // get travel id
+            String travelId = travelData.getString("_id");
 
-        Intent intent = new Intent(this.theActivity, TravelDetailActivity.class);
-        intent.putExtra("TRAVEL_ID", travelId);
-        theActivity.startActivity(intent);
+            // open travel detail activity
+            Intent theIntent = new Intent(this.theActivity, TravelDetailActivity.class);
+            theIntent.putExtra("TRAVEL_ID", travelId);
+            theActivity.startActivity(theIntent);
+        } else {
+            // if there is an error on server
+            String serverMessage = serverResponse.getString("message");
+
+            Toast.makeText(this.theActivity, serverMessage,
+                    Toast.LENGTH_LONG).show();
+        }
     }
 }

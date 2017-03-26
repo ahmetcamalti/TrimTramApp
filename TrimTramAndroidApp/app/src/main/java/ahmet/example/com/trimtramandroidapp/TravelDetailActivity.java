@@ -42,7 +42,5 @@ public class TravelDetailActivity extends AppCompatActivity {
 
         Travel theTravel = new Travel();
         theTravel.createFromJSONString(travelDataString, null);
-
-
     }
 }
